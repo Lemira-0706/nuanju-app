@@ -597,6 +597,7 @@ const state = {
   unreadCount: 0,
   apiKey: localStorage.getItem('deepseek_api_key') || '',
   apiBase: localStorage.getItem('deepseek_api_base') || 'https://api.deepseek.com/v1',
+  aiModel: localStorage.getItem('deepseek_model') || 'deepseek-chat',  // 新增模型字段
   settings: {
     cardFields: { photo: true, room: true, furniture: true, quantity: true, purchaseDate: true, expireDate: true, openDate: false, openUseDays: false, dailyPrice: true, tags: true, status: true },
     formFields: { photo: true, name: true, price: true, quantity: true, purchaseDate: true, expireDate: true, openDate: false, openUseDays: false, room: true, furniture: true, category: true, status: true, tags: true, notes: true }
@@ -1479,6 +1480,17 @@ function renderSettings() {
     <div style="padding:8px 0 20px;">
       ${renderCheckGroup('🃏 物品卡片显示项目', cardFields, 'cardFields')}
       ${renderCheckGroup('📝 物品录入表单显示项目', formFields, 'formFields')}
+      <div style="padding:0 16px; margin-bottom:16px;">
+        <div style="padding:14px;background:var(--card-bg);border-radius:12px;border:1px solid var(--border);">
+          <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;">🤖 AI 模型选择</div>
+          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;">选择用于对话的DeepSeek模型：</div>
+          <select id="aiModelSelect" onchange="changeAIModel(this.value)" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);">
+            <option value="deepseek-chat" ${state.aiModel==='deepseek-chat'?'selected':''}>DeepSeek Chat (通用对话)</option>
+            <option value="deepseek-reasoner" ${state.aiModel==='deepseek-reasoner'?'selected':''}>DeepSeek Reasoner (推理)</option>
+            <option value="deepseek-vl" ${state.aiModel==='deepseek-vl'?'selected':''}>DeepSeek VL (视觉理解)</option>
+          </select>
+        </div>
+      </div>
       <div style="padding:0 16px;">
         <div style="padding:14px;background:var(--card-bg);border-radius:12px;border:1px solid var(--border);">
           <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;">🔔 提醒设置</div>
@@ -1490,6 +1502,13 @@ function renderSettings() {
       </div>
     </div>
   `;
+}
+
+function changeAIModel(model) {
+  state.aiModel = model;
+  localStorage.setItem('deepseek_model', model);
+  showToast('已切换模型：' + model);
+  renderAI(); // 重新渲染AI页面
 }
 
 function toggleSetting(group, field, val) {
@@ -1506,6 +1525,7 @@ const QUICK_PROMPTS = [
   '📊 分析我的收纳数据并给出建议',
   '🗂️ 我的家怎么收纳更整洁',
   '♻️ 帮我找出闲置物品并给处理建议',
+  '📷 识别图片快速添加物品'
 ];
 
 function renderAI() {
@@ -1514,7 +1534,7 @@ function renderAI() {
   page.innerHTML = `
     <div class="chat-container">
       <div class="chat-api-settings">
-        <span>🐻 AI小兜 (DeepSeek)</span>
+        <span>🐻 AI小兜 (${state.aiModel.replace('deepseek-','')})</span>
         ${state.apiKey ? '<span style="color:green;">● 已配置</span>' : '<span style="color:#FFA502;">● 未配置</span>'}
         <button class="set-btn" onclick="openApiSettings()">${state.apiKey ? '更换密钥' : '填写密钥'}</button>
         <button class="set-btn" onclick="clearChat()" style="margin-left:4px;">清空</button>
@@ -1544,7 +1564,7 @@ function renderAI() {
 function renderChatQuickbar() {
   const bar = $('#chatQuickbar');
   if (!bar) return;
-  // 快捷语常驻展示（3 个收纳建议入口）
+  // 快捷语常驻展示（包含识别图片）
   bar.style.display = 'flex';
   bar.innerHTML = QUICK_PROMPTS.map(q => `<span class="quick-chip" onclick="useQuickPrompt('${q.replace(/'/g, "\\'")}')">${q}</span>`).join('');
 }
@@ -1636,9 +1656,30 @@ function renderChatMessages() {
   const container = $('#chatMessages');
   if (!container) return;
   if (chatHistory.length === 0) {
-    chatHistory.push({ role: 'bot', content: '🐻 你好呀！我是小兜～\n\n我可以帮你：\n1️⃣ 分析收纳数据\n2️⃣ 并给出建议\n3️⃣ 闲聊解闷\n\n点下方快捷语、或直接发图试试吧！' });
+    chatHistory.push({ role: 'bot', content: '🐻 你好呀！我是暖居收纳的AI小兜～\n\n我可以帮你：\n1️⃣ 分析收纳数据并给出建议\n2️⃣ 拍照/相册选图识别添加物品记录\n3️⃣ 闲聊解闷\n\n点下方快捷语、或直接发图试试吧！' });
   }
   container.innerHTML = chatHistory.map(msg => {
+    // 如果消息包含物品卡片数据，渲染成卡片
+    if (msg.itemCard) {
+      const ic = msg.itemCard;
+      return `
+      <div class="chat-msg ${msg.role}">
+        <div class="chat-avatar">${msg.role === 'bot' ? '🐻' : '❤'}</div>
+        <div class="chat-bubble">
+          <div style="background:var(--bg);border-radius:10px;padding:10px;margin-top:6px;">
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">📦 检测到物品信息：</div>
+            <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;">
+              <div>名称：${ic.name}</div>
+              <div>价格：¥${ic.price}</div>
+              <div>数量：${ic.quantity}</div>
+              <div>分类：${ic.category}</div>
+            </div>
+            <button style="margin-top:8px;padding:6px 12px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;" onclick="addItemFromCard(${JSON.stringify(ic).replace(/"/g, '&quot;')})">一键添加</button>
+          </div>
+          ${msg.content ? msg.content.replace(/\n/g, '<br>') : ''}
+        </div>
+      </div>`;
+    }
     const imgs = (msg.images || []).map(src => `<img src="${src}" alt="附件图片">`).join('');
     return `
     <div class="chat-msg ${msg.role}">
@@ -1742,7 +1783,11 @@ async function sendChat() {
 - 即将过期：${expiring}
 - 闲置物品：${idleItems}
 
-请用中文回复，语气亲切可爱，适当使用emoji，建议尽量具体。`;
+当用户发送图片时，请仔细识别图片中的物品，并按照以下JSON格式回复（不要包含额外解释，直接输出JSON）：
+{"name":"物品名称","price":数值,"quantity":数值,"category":"分类（从给定分类中选择）"}
+如果无法识别，请回复"抱歉，我没能识别出物品信息，请提供更多细节"。
+
+请用中文回复，语气亲切可爱，适当使用emoji。`;
 
   // 组装多模态消息（文本 + 图片）
   const recent = chatHistory.slice(-12);
@@ -1767,7 +1812,7 @@ async function sendChat() {
         'Authorization': `Bearer ${state.apiKey}`
       },
       body: JSON.stringify({
-        model: 'deepseek-chat',
+        model: state.aiModel, // 使用选择的模型
         messages,
         stream: false
       })
@@ -1775,12 +1820,64 @@ async function sendChat() {
     if (!response.ok) throw new Error('API请求失败 ' + response.status);
     const data = await response.json();
     const reply = (data.choices && data.choices[0] && data.choices[0].message.content) || '（没有得到回复内容）';
-    chatHistory[loadingIdx] = { role: 'bot', content: reply };
+    // 尝试解析JSON物品卡
+    const parsed = parseItemFromAI(reply);
+    if (parsed) {
+      chatHistory[loadingIdx] = { role: 'bot', content: reply, itemCard: parsed };
+    } else {
+      chatHistory[loadingIdx] = { role: 'bot', content: reply };
+    }
   } catch(err) {
     console.error(err);
     chatHistory[loadingIdx] = { role: 'bot', content: buildLocalReply(text, userImages) + '\n\n⚠️ 刚才有道联网请求出错，已切换为本地分析。' };
   }
   renderChatMessages();
+}
+
+function parseItemFromAI(text) {
+  // 尝试提取JSON对象
+  const match = text.match(/\{[\s\S]*\}/);
+  if (match) {
+    try {
+      const json = JSON.parse(match[0]);
+      if (json.name && json.price) {
+        return {
+          name: json.name,
+          price: parseFloat(json.price) || 0,
+          quantity: parseInt(json.quantity) || 1,
+          category: json.category || '📦 其他'
+        };
+      }
+    } catch (e) {}
+  }
+  return null;
+}
+
+function addItemFromCard(card) {
+  // 一键添加物品
+  const newItem = {
+    id: Date.now(),
+    name: card.name,
+    price: card.price,
+    quantity: card.quantity,
+    purchaseDate: '',
+    expireDate: '',
+    openDate: '',
+    openUseDays: '',
+    room: state.rooms[0]?.name || '',
+    furniture: '',
+    category: card.category || '📦 其他',
+    status: '✅ 在用',
+    tags: [],
+    notes: '',
+    photos: [],
+    dailyPrice: 0,
+  };
+  newItem.dailyPrice = calcDailyPrice(newItem);
+  state.items.push(newItem);
+  generateReminders();
+  showToast('已添加物品：' + card.name);
+  renderChatMessages(); // 刷新聊天，移除按钮
 }
 
 // 未配置密钥 / 离线时的本地智能分析回复
@@ -1976,9 +2073,9 @@ function renderEntryPage() {
     <div style="padding:12px 0 0;">
       ${f.photo ? `
       <div class="form-group">
-        <label>📷 照片（最多3张，第1张为封面）</label>
+        <label>📷 照片（最多3张，第一张为封面）</label>
         <div class="photo-upload" id="photoUpload" style="margin-top:6px;"></div>
-        <div class="photo-hint">连续点击2次非首张照片可设为封面；× 删除。相册支持一次选多张（最多3张）。</div>
+        <div class="photo-hint">连续点击2次非首张照片可设为封面；拖拽可调整顺序；× 删除。相册支持一次选多张（最多3张）。</div>
       </div>` : ''}
 
       <div class="entry-tabs">
@@ -2373,6 +2470,8 @@ window.onHomeSearch = onHomeSearch;
 window.doHomeSearch = doHomeSearch;
 window.applyTheme = applyTheme;
 window.clearChat = clearChat;
+window.addItemFromCard = addItemFromCard;
+window.changeAIModel = changeAIModel;
 // 暴露内部状态（便于调试与自动化测试，不影响生产功能）
 window.state = state;
 
