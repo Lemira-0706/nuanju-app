@@ -597,7 +597,7 @@ const state = {
   unreadCount: 0,
   apiKey: localStorage.getItem('deepseek_api_key') || '',
   apiBase: localStorage.getItem('deepseek_api_base') || 'https://api.deepseek.com/v1',
-  aiModel: localStorage.getItem('deepseek_model') || 'deepseek-chat',  // 新增模型字段
+  aiModel: localStorage.getItem('deepseek_model') || 'deepseek-chat',  // 默认文本模型
   settings: {
     cardFields: { photo: true, room: true, furniture: true, quantity: true, purchaseDate: true, expireDate: true, openDate: false, openUseDays: false, dailyPrice: true, tags: true, status: true },
     formFields: { photo: true, name: true, price: true, quantity: true, purchaseDate: true, expireDate: true, openDate: false, openUseDays: false, room: true, furniture: true, category: true, status: true, tags: true, notes: true }
@@ -1483,12 +1483,16 @@ function renderSettings() {
       <div style="padding:0 16px; margin-bottom:16px;">
         <div style="padding:14px;background:var(--card-bg);border-radius:12px;border:1px solid var(--border);">
           <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;">🤖 AI 模型选择</div>
-          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;">选择用于对话的DeepSeek模型：</div>
+          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;">选择用于对话的模型：</div>
           <select id="aiModelSelect" onchange="changeAIModel(this.value)" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);">
-            <option value="deepseek-chat" ${state.aiModel==='deepseek-chat'?'selected':''}>DeepSeek Chat (通用对话)</option>
+            <option value="deepseek-chat" ${state.aiModel==='deepseek-chat'?'selected':''}>DeepSeek Chat (纯文本)</option>
             <option value="deepseek-reasoner" ${state.aiModel==='deepseek-reasoner'?'selected':''}>DeepSeek Reasoner (推理)</option>
-            <option value="deepseek-vl" ${state.aiModel==='deepseek-vl'?'selected':''}>DeepSeek VL (视觉理解)</option>
+            <option value="gpt-4o" ${state.aiModel==='gpt-4o'?'selected':''}>GPT-4o (支持图片识别)</option>
+            <option value="gpt-4o-mini" ${state.aiModel==='gpt-4o-mini'?'selected':''}>GPT-4o Mini (支持图片识别)</option>
           </select>
+          <div style="font-size:11px;color:var(--primary-dark);margin-top:8px;line-height:1.6;">
+            ⚠️ 注意：DeepSeek 官方 API 目前不支持图片识别。若要使用“拍照识物”功能，请切换至 GPT-4o 等支持多模态的模型，并在下方 API Key 中配置对应的 Key（须以 sk- 开头）。
+          </div>
         </div>
       </div>
       <div style="padding:0 16px;">
@@ -1531,10 +1535,11 @@ const QUICK_PROMPTS = [
 function renderAI() {
   const page = $('#page-ai');
   page.classList.add('no-page-pad'); // 聊天页自行控制高度，无额外 padding
+  const modelLabel = state.aiModel === 'deepseek-chat' ? 'Chat(纯文本)' : state.aiModel === 'deepseek-reasoner' ? 'Reasoner(推理)' : state.aiModel === 'gpt-4o' ? 'GPT-4o(支持识图)' : 'Mini(支持识图)';
   page.innerHTML = `
     <div class="chat-container">
       <div class="chat-api-settings">
-        <span>🐻 AI小兜 (${state.aiModel.replace('deepseek-','')})</span>
+        <span>🐻 AI小兜 (${modelLabel})</span>
         ${state.apiKey ? '<span style="color:green;">● 已配置</span>' : '<span style="color:#FFA502;">● 未配置</span>'}
         <button class="set-btn" onclick="openApiSettings()">${state.apiKey ? '更换密钥' : '填写密钥'}</button>
         <button class="set-btn" onclick="clearChat()" style="margin-left:4px;">清空</button>
@@ -1656,7 +1661,7 @@ function renderChatMessages() {
   const container = $('#chatMessages');
   if (!container) return;
   if (chatHistory.length === 0) {
-    chatHistory.push({ role: 'bot', content: '🐻 日安！我是你的助手小兜～\n\n我可以帮你：\n1️⃣ 分析收纳数据并给出建议\n2️⃣ 拍照/相册选图识别添加物品记录\n3️⃣ 闲聊解闷\n\n点下方快捷语、或直接发图试试吧！' });
+    chatHistory.push({ role: 'bot', content: '🐻 你好呀！我是暖居收纳的AI小兜～\n\n我可以帮你：\n1️⃣ 分析收纳数据并给出建议\n2️⃣ 拍照/相册选图识别添加物品记录（需切换GPT-4o等视觉模型）\n3️⃣ 闲聊解闷\n\n点下方快捷语、或直接发图试试吧！' });
   }
   container.innerHTML = chatHistory.map(msg => {
     // 如果消息包含物品卡片数据，渲染成卡片
@@ -1664,7 +1669,7 @@ function renderChatMessages() {
       const ic = msg.itemCard;
       return `
       <div class="chat-msg ${msg.role}">
-        <div class="chat-avatar">${msg.role === 'bot' ? '🐻' : '🍯'}</div>
+        <div class="chat-avatar">${msg.role === 'bot' ? '🐻' : '❤'}</div>
         <div class="chat-bubble">
           <div style="background:var(--bg);border-radius:10px;padding:10px;margin-top:6px;">
             <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">📦 检测到物品信息：</div>
@@ -1683,7 +1688,7 @@ function renderChatMessages() {
     const imgs = (msg.images || []).map(src => `<img src="${src}" alt="附件图片">`).join('');
     return `
     <div class="chat-msg ${msg.role}">
-      <div class="chat-avatar">${msg.role === 'bot' ? '🐻' : '🍯'}</div>
+      <div class="chat-avatar">${msg.role === 'bot' ? '🐻' : '❤'}</div>
       <div class="chat-bubble">${msg.content ? msg.content.replace(/\n/g, '<br>') : ''}${imgs}</div>
     </div>`;
   }).join('');
@@ -1702,9 +1707,10 @@ function openApiSettings() {
     <div class="modal-overlay active" id="apiModal" style="z-index:600;">
       <div class="modal-content" style="position:relative;width:85%;">
         <button class="modal-close" onclick="$('#apiModal').remove()">✕</button>
-        <h3>🔑 DeepSeek API 设置</h3>
+        <h3>🔑 API 设置</h3>
         <div style="font-size:12px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">
-          获取密钥: 访问 platform.deepseek.com → API Keys → 创建<br>
+          DeepSeek 密钥: 访问 platform.deepseek.com → API Keys → 创建<br>
+          GPT-4o 密钥: 访问 platform.openai.com → API Keys → 创建<br>
           密钥以 sk- 开头，请妥善保管
         </div>
         <div class="form-group">
@@ -1714,6 +1720,9 @@ function openApiSettings() {
         <div class="form-group">
           <label>API Key</label>
           <input type="password" id="apiKeyInput" value="${state.apiKey}" placeholder="sk-xxxxxxxx">
+        </div>
+        <div style="font-size:11px;color:var(--primary-dark);margin-bottom:10px;">
+          💡 注意：若要支持图片识别，请选择 GPT-4o 模型并将 Base URL 设置为 https://api.openai.com/v1
         </div>
         <button class="btn-save" style="width:100%;margin-top:8px;" onclick="saveApiSettings()">保存</button>
       </div>
@@ -1762,6 +1771,17 @@ async function sendChat() {
       chatHistory[loadingIdx] = { role: 'bot', content: buildLocalReply(text, userImages) };
       renderChatMessages();
     }, 500);
+    return;
+  }
+
+  // **关键修改**：检查模型是否支持视觉（多模态）
+  const supportsVision = state.aiModel.includes('gpt-4o') || state.aiModel.includes('gpt-4-turbo'); // 或者其他视觉模型
+  // 如果当前模型不支持视觉且用户发来了图片，则不发图片请求，只发文字并提示
+  let imagesToSend = userImages;
+  if (!supportsVision && userImages.length > 0) {
+    imagesToSend = []; // 不发送图片
+    chatHistory.push({ role: 'bot', content: '🐻 当前模型（DeepSeek）不支持直接识别图片。\n\n💡 建议：在设置中切换为 “GPT-4o” 等支持多模态的模型，并配置对应的 API Key，即可实现“看图加物品”。\n\n或者，你可以先用文字描述一下图片里的物品，我来帮你生成记录~' });
+    renderChatMessages();
     return;
   }
 
@@ -1886,7 +1906,7 @@ function buildLocalReply(text, images) {
   const lower = (text || '').toLowerCase();
   let reply = '';
   if (hasImg) {
-    reply += '📷 收到你发来的图片啦！配置 DeepSeek API Key 后，我可以精准识别图中物品并帮你一键添加记录。\n\n';
+    reply += '📷 收到你发来的图片啦！当前模型不支持识图，配置支持多模态的API（如GPT-4o）后，我可以精准识别图中物品并帮你一键添加记录。\n\n';
   }
   if (lower.includes('资产') || lower.includes('统计') || lower.includes('概况')) {
     const total = state.items.reduce((s,i)=>s+i.price*i.quantity,0);
@@ -2404,7 +2424,7 @@ function init() {
   bindKeyboardAdjust();
   // 页面加载动画
   setTimeout(() => {
-    showToast('🐻 欢迎回到温暖的小家');
+    showToast('🐻 欢迎使用暖居收纳');
   }, 500);
 }
 
