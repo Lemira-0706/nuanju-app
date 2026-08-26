@@ -128,7 +128,6 @@ img { max-width: 100%; }
 /* ========== 顶部栏 ========== */
 .top-bar {
   display: flex; align-items: center; justify-content: space-between;
-  /* 问题1：缩减顶部栏上下留白，logo 与标题（页面标题/统计卡片）更紧凑 */
   padding: 8px 14px; padding-top: calc(8px + env(safe-area-inset-top));
   background: var(--card-bg);
   z-index: 100; flex-shrink: 0;
@@ -365,14 +364,12 @@ img { max-width: 100%; }
 
 /* 录入/编辑页底部操作按钮：紧贴底部导航栏之上，不再留有空隙也不会被遮挡 */
 .entry-form-actions {
-  /* 问题2：按钮始终停在底部导航栏（56px + safe-area）的正上方，消除空隙与遮挡 */
   position: sticky; bottom: 0;
   display: flex; gap: 10px;
   padding: 9px 12px calc(9px + env(safe-area-inset-bottom));
   margin-top: 8px;
   background: var(--card-bg);
   border-top: 1px solid var(--border);
-  /* 缩小按钮体积（问题2）：紧凑高度 */
 }
 .entry-form-actions .btn-cancel,
 .entry-form-actions .btn-save { flex: 1; }
@@ -383,24 +380,19 @@ img { max-width: 100%; }
   .entry-form-actions .btn-save { padding: 10px 4px; font-size: 13px; }
 }
 .btn-cancel, .btn-save {
-  /* 问题2：缩小按钮体积——高度由 14px*2+行高 降至紧凑 11px，圆角收小 */
   flex: 1; padding: 11px 8px; border-radius: 10px; font-size: 14px; font-weight: 600;
   border: none; cursor: pointer; line-height: 1.2; transition: transform 0.15s;
 }
 .btn-cancel { background: var(--card-bg); color: var(--text-secondary); border: 1px solid var(--border); }
 .btn-save { background: var(--gradient); color: #fff; }
-/* 保存+继续 视觉稍弱，与主"保存"区分 */
 .entry-form-actions .btn-save + .btn-save { background: var(--card-bg); color: var(--primary); border: 1.5px solid var(--primary); }
 .btn-cancel:active, .btn-save:active { transform: scale(0.96); }
 
 /* ========== AI对话 ========== */
 .chat-container { display: flex; flex-direction: column; height: 100%; padding-bottom: 0; min-height: 0; }
-/* 聊天页：自身精确布局，不受 .page 的滚动 padding 影响；
-   底部预留导航栏高度，确保输入框不被遮挡 */
 #page-ai { padding-bottom: 0; overflow: hidden; }
 #page-ai .chat-container { padding-bottom: calc(56px + env(safe-area-inset-bottom)); box-sizing: border-box; }
 .chat-input-bar { position: sticky; bottom: 0; }
-#page-ai.chat-page-active { /* 标记用 */ }
 .chat-messages { flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; padding: 16px; padding-bottom: 20px; display: flex; flex-direction: column; gap: 14px; min-height: 0; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .chat-messages::-webkit-scrollbar { display: none; }
 .chat-msg { display: flex; gap: 8px; align-items: flex-start; max-width: 85%; }
@@ -418,9 +410,11 @@ img { max-width: 100%; }
 .chat-attach-preview .thumb img { width: 100%; height: 100%; object-fit: cover; }
 .chat-attach-preview .thumb .rm { position: absolute; top: -4px; right: -4px; width: 18px; height: 18px; border-radius: 50%; background: #ff4d4f; color: #fff; font-size: 11px; line-height: 18px; text-align: center; cursor: pointer; }
 
-.chat-quickbar { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 12px; background: var(--card-bg); border-top: 1px solid var(--border); flex-shrink: 0; }
-.chat-quickbar .quick-chip { padding: 7px 13px; border-radius: 16px; background: var(--primary-light); color: var(--primary); font-size: 12px; border: 1px solid var(--primary); cursor: pointer; white-space: nowrap; transition: background 0.2s; }
-.chat-quickbar .quick-chip:active { background: var(--primary); color: #fff; }
+/* 优化：快捷语改为单行横向滑动，高度降低 */
+.chat-quickbar { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 6px; padding: 6px 12px; background: var(--card-bg); border-top: 1px solid var(--border); flex-shrink: 0; scrollbar-width: none; }
+.chat-quickbar::-webkit-scrollbar { display: none; }
+.quick-chip { padding: 5px 10px; border-radius: 14px; background: var(--primary-light); color: var(--primary); font-size: 11px; border: 1px solid var(--primary); cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: background 0.2s; }
+.quick-chip:active { background: var(--primary); color: #fff; }
 
 .chat-input-bar { display: flex; gap: 6px; padding: 8px 10px; padding-bottom: calc(8px + env(safe-area-inset-bottom)); background: var(--card-bg); border-top: 1px solid var(--border); align-items: flex-end; box-sizing: border-box; flex-shrink: 0; }
 .chat-input-bar .input-wrap { flex: 1 1 auto; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
@@ -499,7 +493,6 @@ img { max-width: 100%; }
 .reminder-item .ractions .btn-read:hover { background: var(--primary-light); }
 .reminder-item .ractions .btn-del { color: #FF4757; }
 .reminder-item .ractions .btn-del:hover { background: #FFE0E3; }
-/* 已读后该项视觉置灰 */
 .reminder-item.read { opacity: 0.55; }
 .reminder-item.read .ractions .btn-read { opacity: 0.4; }
 .reminder-actions { display: flex; gap: 8px; padding: 0 16px 12px; }
@@ -590,14 +583,14 @@ img { max-width: 100%; }
 // ========== 全局状态 ==========
 const state = {
   currentPage: 'home',
-  currentNav: 'home', // 底部导航高亮项：home / reminders / ai / items
+  currentNav: 'home', 
   currentTheme: 'theme-sakura',
   currentRoom: '客厅',
   selectedFurniture: null,
   unreadCount: 0,
   apiKey: localStorage.getItem('deepseek_api_key') || '',
   apiBase: localStorage.getItem('deepseek_api_base') || 'https://api.deepseek.com/v1',
-  aiModel: localStorage.getItem('deepseek_model') || 'deepseek-chat',  // 默认文本模型
+  aiModel: localStorage.getItem('deepseek_model') || 'deepseek-chat',
   settings: {
     cardFields: { photo: true, room: true, furniture: true, quantity: true, purchaseDate: true, expireDate: true, openDate: false, openUseDays: false, dailyPrice: true, tags: true, status: true },
     formFields: { photo: true, name: true, price: true, quantity: true, purchaseDate: true, expireDate: true, openDate: false, openUseDays: false, room: true, furniture: true, category: true, status: true, tags: true, notes: true }
@@ -666,7 +659,6 @@ function formatDate(d) {
 function calcDailyPrice(item) {
   if (!item.price || !item.purchaseDate) return 0;
   const days = daysUntil(new Date().toISOString().slice(0,10)) !== null ? Math.max(1, -daysUntil(item.purchaseDate)) : 1;
-  // 简单算法：总价 / (预计使用天数 或 已使用天数)
   let useDays = 365;
   if (item.openUseDays) useDays = item.openUseDays;
   return (item.price * item.quantity / useDays).toFixed(2);
@@ -730,7 +722,7 @@ function renderApp() {
     <div class="pages" id="pages"></div>
     <div class="bottom-nav" id="bottomNav"></div>
     <!-- 侧边菜单 -->
-    <div class="side-menu-overlay" id="menuOverlay"></div>
+    <div class="side-menu-overlay" id="menuOverlay" onclick="closeMenuAndGoHome()"></div>
     <div class="side-menu" id="sideMenu"></div>
   `;
   getEl().innerHTML = html;
@@ -757,7 +749,6 @@ function renderTopBar() {
 
 function renderBottomNav() {
   const nav = $('#bottomNav');
-  // 当前底部导航高亮项：由 state.currentNav 决定（home / reminders / ai / items）
   const cur = state.currentNav || 'home';
   const badge = state.unreadCount > 99 ? '99+' : state.unreadCount;
   nav.innerHTML = `
@@ -778,7 +769,6 @@ function renderBottomNav() {
   `;
 }
 
-// 底部导航统一入口：同步 currentNav 高亮状态
 function bottomNavTo(key) {
   if (key === 'reminders') { showPage('reminders'); }
   else { showPage(key); }
@@ -829,16 +819,13 @@ function renderPages() {
 
 function showPage(page) {
   state.currentPage = page;
-  // 底部导航高亮同步（home/reminders/ai/items 四种对应导航项）
   if (['home','reminders','ai','items'].includes(page)) {
     state.currentNav = page;
   }
-  // 更新页面active
   $$('.page').forEach(p => p.classList.remove('active'));
   const targetPage = document.getElementById('page-' + page);
   if (targetPage) targetPage.classList.add('active');
 
-  // 渲染对应内容
   switch(page) {
     case 'home': renderHome(); break;
     case 'items': renderItems(); break;
@@ -859,6 +846,24 @@ function navigateTo(page) {
   showPage(page);
 }
 
+// ---- 菜单相关函数 ----
+function toggleMenu() {
+  const overlay = document.getElementById('menuOverlay');
+  const menu = document.getElementById('sideMenu');
+  overlay.classList.toggle('active');
+  menu.classList.toggle('open');
+}
+
+function closeMenu() {
+  document.getElementById('menuOverlay').classList.remove('active');
+  document.getElementById('sideMenu').classList.remove('open');
+}
+
+// 【新增】点击遮罩返回首页
+function closeMenuAndGoHome() {
+  showPage('home');
+}
+
 // ---- 首页 ----
 function renderHome() {
   const page = $('#page-home');
@@ -867,7 +872,6 @@ function renderHome() {
   const avgDaily = state.items.reduce((s, i) => s + parseFloat(i.dailyPrice || 0), 0);
 
   const rooms = state.rooms;
-  // 匹配当前房间：state.currentRoom 存的是"🛋️ 客厅"，与 room.name 格式一致
   let matchedRoom = rooms.find(r => r.name === state.currentRoom);
   if (!matchedRoom) matchedRoom = rooms[0];
   if (!state.currentRoom && matchedRoom) state.currentRoom = matchedRoom.name;
@@ -923,7 +927,6 @@ let subFilter = '';
 
 function renderItems() {
   const page = $('#page-items');
-  // 首次构建：搜索框 + 筛选栏 + 卡片网格容器（仅构建一次，避免输入失焦）
   if (!page.dataset.built) {
     page.innerHTML = `
       <div class="items-toolbar">
@@ -939,7 +942,6 @@ function renderItems() {
   }
   renderFilterBar();
   renderItemGrid();
-  // 恢复搜索框焦点位置（不强制聚焦，仅同步值）
   const input = document.getElementById('itemSearchInput');
   if (input && input.value !== state.searchKeyword) input.value = state.searchKeyword || '';
 }
@@ -957,7 +959,6 @@ function renderFilterBar() {
   if (!bar) return;
   let html = filters.map(f => `<div class="filter-chip ${state.filterType === f.key ? 'active' : ''}" onclick="setFilter('${f.key}')">${f.label}</div>`).join('');
 
-  // 二级筛选：选中分类后展开具体选项
   if (state.filterType !== 'all') {
     let options = [];
     switch(state.filterType) {
@@ -975,12 +976,11 @@ function renderFilterBar() {
 function setFilter(type) {
   state.filterType = type;
   subFilter = '';
-  // 保留搜索框：仅重绘筛选栏与卡片
   renderFilterBar();
   renderItemGrid();
 }
 function setSubFilter(val) {
-  subFilter = subFilter === val ? '' : val; // 再次点击取消
+  subFilter = subFilter === val ? '' : val;
   renderFilterBar();
   renderItemGrid();
 }
@@ -1058,13 +1058,11 @@ function renderStats() {
   const avgPrice = totalItems > 0 ? (totalValue / totalItems).toFixed(0) : 0;
   const dailyTotal = state.items.reduce((s, i) => s + parseFloat(i.dailyPrice || 0), 0).toFixed(2);
 
-  // 按分类统计
   const catStats = {};
   state.categories.forEach(c => catStats[c] = 0);
   state.items.forEach(i => { catStats[i.category] = (catStats[i.category] || 0) + i.price * i.quantity; });
   const maxCatVal = Math.max(...Object.values(catStats), 1);
 
-  // 按房间统计
   const roomStats = {};
   state.rooms.forEach(r => roomStats[r.name] = 0);
   state.items.forEach(i => { roomStats[i.room] = (roomStats[i.room] || 0) + i.price * i.quantity; });
@@ -1524,12 +1522,11 @@ function toggleSetting(group, field, val) {
 let chatHistory = [];
 let pendingImages = []; // 待发送的 base64 图片数组
 
-// 收纳数据与建议的快捷语
+// 收纳数据与建议的快捷语（精简优化后的核心快捷语）
 const QUICK_PROMPTS = [
-  '📊 分析我的收纳数据并给出建议',
-  '🗂️ 我的家怎么收纳更整洁',
-  '♻️ 帮我找出闲置物品并给处理建议',
-  '📷 识别图片快速添加物品'
+  '📊 分析我的收纳数据',
+  '🗂️ 收纳建议',
+  '♻️ 找出闲置物品'
 ];
 
 function renderAI() {
@@ -1569,7 +1566,7 @@ function renderAI() {
 function renderChatQuickbar() {
   const bar = $('#chatQuickbar');
   if (!bar) return;
-  // 快捷语常驻展示（包含识别图片）
+  // 快捷语常驻展示（精简且横向滚动）
   bar.style.display = 'flex';
   bar.innerHTML = QUICK_PROMPTS.map(q => `<span class="quick-chip" onclick="useQuickPrompt('${q.replace(/'/g, "\\'")}')">${q}</span>`).join('');
 }
@@ -1619,13 +1616,11 @@ function hideChatSheet() {
   const s = $('#chatSourceSheet'); if (s) s.classList.remove('show');
 }
 function chatUploadImages() {
-  // 访问相册（不设置 capture，唤起系统文件/相册选择器，支持多选）
   const input = $('#chatAlbumInput') || $('#chatFileInput');
   input.removeAttribute('capture');
   input.click();
 }
 function chatTakePhoto() {
-  // 调用相机（capture=environment 优先后置摄像头）
   const input = $('#chatFileInput');
   input.setAttribute('capture', 'environment');
   input.click();
@@ -1661,7 +1656,7 @@ function renderChatMessages() {
   const container = $('#chatMessages');
   if (!container) return;
   if (chatHistory.length === 0) {
-    chatHistory.push({ role: 'bot', content: '🐻 你好呀！我是暖居收纳的AI小兜～\n\n我可以帮你：\n1️⃣ 分析收纳数据并给出建议\n2️⃣ 拍照/相册选图识别添加物品记录（需切换GPT-4o等视觉模型）\n3️⃣ 闲聊解闷\n\n点下方快捷语、或直接发图试试吧！' });
+    chatHistory.push({ role: 'bot', content: '🐻 你好呀！我是小熊小兜～\n\n我可以帮你：\n1️⃣ 分析收纳数据并给出建议\n2️⃣ 拍照/相册选图识别添加物品记录（需切换GPT-4o等视觉模型）\n3️⃣ 闲聊解闷\n\n点下方快捷语、或直接发图试试吧！' });
   }
   container.innerHTML = chatHistory.map(msg => {
     // 如果消息包含物品卡片数据，渲染成卡片
@@ -1669,7 +1664,7 @@ function renderChatMessages() {
       const ic = msg.itemCard;
       return `
       <div class="chat-msg ${msg.role}">
-        <div class="chat-avatar">${msg.role === 'bot' ? '🐻' : '❤'}</div>
+        <div class="chat-avatar">${msg.role === 'bot' ? '🐻' : '🍯'}</div>
         <div class="chat-bubble">
           <div style="background:var(--bg);border-radius:10px;padding:10px;margin-top:6px;">
             <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">📦 检测到物品信息：</div>
@@ -1688,7 +1683,7 @@ function renderChatMessages() {
     const imgs = (msg.images || []).map(src => `<img src="${src}" alt="附件图片">`).join('');
     return `
     <div class="chat-msg ${msg.role}">
-      <div class="chat-avatar">${msg.role === 'bot' ? '🐻' : '❤'}</div>
+      <div class="chat-avatar">${msg.role === 'bot' ? '🐻' : '🍯'}</div>
       <div class="chat-bubble">${msg.content ? msg.content.replace(/\n/g, '<br>') : ''}${imgs}</div>
     </div>`;
   }).join('');
@@ -2044,7 +2039,6 @@ function openItemDetail(id) {
 }
 
 function backFromDetail() {
-  // 返回到之前的页面
   if (state.selectedFurniture) {
     renderFurniturePage();
     state.currentPage = 'furniture';
@@ -2077,10 +2071,9 @@ function openEntry(itemId) {
 
 function renderEntryPage() {
   const page = $('#page-entry');
-  page.classList.add('no-page-pad'); // 录入页自身控制底部留白（容纳底部按钮）
+  page.classList.add('no-page-pad');
   const editing = state.editingItem;
   const f = state.settings.formFields;
-  // 修复：优先使用已存在的 currentPhotos，避免重绘时被旧数据覆盖
   const photos = (state._currentPhotos && state._currentPhotos.length > 0) ? state._currentPhotos : (editing ? [...editing.photos] : []);
   state._currentPhotos = photos;
 
@@ -2148,7 +2141,7 @@ function renderEntryPage() {
     </div>
   `;
   updateFurnitureOptions();
-  renderPhotoUpload(); // 初始化照片缩略块（独立于整体渲染，避免后续 addPhoto 冲掉表单）
+  renderPhotoUpload();
 }
 
 function updateFurnitureOptions() {
@@ -2166,7 +2159,7 @@ function toggleTagChip(el, tag) {
   else state.selectedTags = state.selectedTags.filter(t => t !== tag);
 }
 
-// 渲染照片上传区（仅局部重绘，避免 addPhoto 时整体 renderEntryPage 冲掉未保存的表单输入）
+// 渲染照片上传区
 function renderPhotoUpload() {
   const wrap = document.getElementById('photoUpload');
   if (!wrap) return;
@@ -2192,10 +2185,8 @@ function renderPhotoUpload() {
 }
 
 function addPhoto(mode) {
-  // mode: 'camera' 调用摄像头 / 'album' 访问相册（实际打包时替换为 Capacitor/Cordova 相机插件）
   const input = document.createElement('input');
   input.type = 'file'; input.accept = 'image/*';
-  // 相册模式：支持多选（不设置 capture，allow multiple）
   if (mode === 'album') input.multiple = true;
   if (mode === 'camera') input.capture = 'environment'; // 后置摄像头
   input.onchange = (e) => {
@@ -2212,7 +2203,7 @@ function addPhoto(mode) {
       const reader = new FileReader();
       reader.onload = (ev) => {
         state._currentPhotos.push(ev.target.result);
-        renderPhotoUpload(); // 局部刷新，不冲掉表单其它输入
+        renderPhotoUpload();
         pending--;
         if (pending === 0) {
           showToast(mode === 'camera'
@@ -2245,14 +2236,12 @@ function onPhotoClick(index) {
   }
 }
 
-// 删除某张照片
 function removePhoto(index) {
   if (!state._currentPhotos) return;
   state._currentPhotos.splice(index, 1);
   renderEntryPage();
 }
 
-// 设置指定索引为封面（第一张），其余顺序不变
 function setCover(index) {
   if (!state._currentPhotos || index < 0 || index >= state._currentPhotos.length) return;
   const [item] = state._currentPhotos.splice(index, 1);
@@ -2261,11 +2250,9 @@ function setCover(index) {
   showToast('已设为封面');
 }
 
-/* 拖动排序 —— 基于 Pointer Events 统一桌面/移动端 */
 let dragIdx = -1, dragStartX = 0, dragStartY = 0, dragEl = null, dragList = [], dragMoved = false;
 
 function photoDragStart(i, ev) {
-  // 仅响应主按钮 / 触摸
   if (ev.type === 'pointerdown' && ev.button !== 0) return;
   dragIdx = i; dragMoved = false;
   dragList = Array.from(document.querySelectorAll('.photo-thumb.draggable'));
@@ -2286,13 +2273,11 @@ function photoDragMove(ev) {
   if (dragIdx < 0 || !dragEl) return;
   const t = ev.touches ? ev.touches[0] : ev;
   const dx = t.clientX - dragStartX, dy = t.clientY - dragStartY;
-  // 移动超过阈值才视为拖动
   if (!dragMoved && Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
   dragMoved = true;
   if (ev.cancelable) ev.preventDefault();
   dragEl.style.transform = `translate(${dx}px, ${dy}px)`;
   dragEl.style.zIndex = '100';
-  // 计算落点：当前指针落在哪一块上
   let overIdx = dragIdx;
   dragList.forEach((el, idx) => {
     if (el === dragEl) return;
@@ -2320,7 +2305,6 @@ function photoDragEnd() {
   if (dragMoved) renderEntryPage();
 }
 
-// 桌面端拖拽备用（dragstart/drop API，与 pointer 二选一生效）
 function photoDragOver(ev) { ev.preventDefault(); }
 function photoDrop(ev, i) {
   ev.preventDefault();
@@ -2395,6 +2379,11 @@ function closeMenu() {
   document.getElementById('sideMenu').classList.remove('open');
 }
 
+// 【新增】点击遮罩返回首页
+function closeMenuAndGoHome() {
+  showPage('home');
+}
+
 function openSettings() {
   showPage('settings');
 }
@@ -2405,7 +2394,6 @@ function bindKeyboardAdjust() {
   if (!phone || !window.visualViewport) return;
   const vv = window.visualViewport;
   const onResize = () => {
-    // 键盘弹起时把聊天输入栏上推，避免被遮挡
     const chatPage = document.getElementById('page-ai');
     if (!chatPage || !chatPage.classList.contains('active')) return;
     const offset = window.innerHeight - vv.height - vv.offsetTop;
@@ -2422,9 +2410,8 @@ function init() {
   renderApp();
   generateReminders();
   bindKeyboardAdjust();
-  // 页面加载动画
   setTimeout(() => {
-    showToast('🐻 欢迎使用暖居收纳');
+    showToast('🐻 欢迎回到温暖的家');
   }, 500);
 }
 
@@ -2433,6 +2420,7 @@ window.showPage = showPage;
 window.navigateTo = navigateTo;
 window.toggleMenu = toggleMenu;
 window.closeMenu = closeMenu;
+window.closeMenuAndGoHome = closeMenuAndGoHome;
 window.openSettings = openSettings;
 window.randomTheme = randomTheme;
 window.switchRoom = switchRoom;
