@@ -1636,7 +1636,7 @@ function renderChatMessages() {
   const container = $('#chatMessages');
   if (!container) return;
   if (chatHistory.length === 0) {
-    chatHistory.push({ role: 'bot', content: '🐻 你好呀！我是暖居收纳的AI小兜～\n\n我可以帮你：\n1️⃣ 分析收纳数据并给出建议\n2️⃣ 拍照/相册选图识别添加物品记录\n3️⃣ 闲聊解闷\n\n点下方快捷语、或直接发图试试吧！' });
+    chatHistory.push({ role: 'bot', content: '🐻 你好呀！我是小兜～\n\n我可以帮你：\n1️⃣ 分析收纳数据\n2️⃣ 并给出建议\n3️⃣ 闲聊解闷\n\n点下方快捷语、或直接发图试试吧！' });
   }
   container.innerHTML = chatHistory.map(msg => {
     const imgs = (msg.images || []).map(src => `<img src="${src}" alt="附件图片">`).join('');
