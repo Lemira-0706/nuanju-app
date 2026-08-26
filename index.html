@@ -1656,7 +1656,7 @@ function renderChatMessages() {
   const container = $('#chatMessages');
   if (!container) return;
   if (chatHistory.length === 0) {
-    chatHistory.push({ role: 'bot', content: '🐻 你好呀！我是暖居收纳的AI小兜～\n\n我可以帮你：\n1️⃣ 分析收纳数据并给出建议\n2️⃣ 拍照/相册选图识别添加物品记录\n3️⃣ 闲聊解闷\n\n点下方快捷语、或直接发图试试吧！' });
+    chatHistory.push({ role: 'bot', content: '🐻 日安！我是你的助手小兜～\n\n我可以帮你：\n1️⃣ 分析收纳数据并给出建议\n2️⃣ 拍照/相册选图识别添加物品记录\n3️⃣ 闲聊解闷\n\n点下方快捷语、或直接发图试试吧！' });
   }
   container.innerHTML = chatHistory.map(msg => {
     // 如果消息包含物品卡片数据，渲染成卡片
@@ -1664,7 +1664,7 @@ function renderChatMessages() {
       const ic = msg.itemCard;
       return `
       <div class="chat-msg ${msg.role}">
-        <div class="chat-avatar">${msg.role === 'bot' ? '🐻' : '❤'}</div>
+        <div class="chat-avatar">${msg.role === 'bot' ? '🐻' : '🍯'}</div>
         <div class="chat-bubble">
           <div style="background:var(--bg);border-radius:10px;padding:10px;margin-top:6px;">
             <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">📦 检测到物品信息：</div>
@@ -1683,7 +1683,7 @@ function renderChatMessages() {
     const imgs = (msg.images || []).map(src => `<img src="${src}" alt="附件图片">`).join('');
     return `
     <div class="chat-msg ${msg.role}">
-      <div class="chat-avatar">${msg.role === 'bot' ? '🐻' : '❤'}</div>
+      <div class="chat-avatar">${msg.role === 'bot' ? '🐻' : '🍯'}</div>
       <div class="chat-bubble">${msg.content ? msg.content.replace(/\n/g, '<br>') : ''}${imgs}</div>
     </div>`;
   }).join('');
@@ -2404,7 +2404,7 @@ function init() {
   bindKeyboardAdjust();
   // 页面加载动画
   setTimeout(() => {
-    showToast('🐻 欢迎使用暖居收纳');
+    showToast('🐻 欢迎回到温暖的小家');
   }, 500);
 }
 
