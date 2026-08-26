@@ -2365,7 +2365,7 @@ init();
       // 注册 Service Worker，让 PWA 可独立运行（离线缓存）
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', function () {
-          navigator.serviceWorker.register('/sw.js').catch(function (err) {
+          navigator.serviceWorker.register('sw.js').catch(function (err) {
             console.log('SW 注册失败（不影响使用）：', err);
           });
         });
