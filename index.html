@@ -340,7 +340,7 @@ img { max-width: 100%; }
   background: var(--primary); color: #fff; font-size: 9px; font-weight: 700;
   text-align: center; padding: 1px 0; line-height: 1.4;
 }
-/* 非封面图：悬停/常态显示"设为封面"，点击即设 */
+/* 非封面图：显示提示文字 */
 .cover-set {
   position: absolute; left: 0; bottom: 0; width: 100%;
   background: rgba(0,0,0,0.45); color: #fff; font-size: 9px; font-weight: 600;
@@ -1963,7 +1963,8 @@ function renderEntryPage() {
   page.classList.add('no-page-pad'); // 录入页自身控制底部留白（容纳底部按钮）
   const editing = state.editingItem;
   const f = state.settings.formFields;
-  const photos = editing ? [...editing.photos] : [];
+  // 修复：优先使用已存在的 currentPhotos，避免重绘时被旧数据覆盖
+  const photos = (state._currentPhotos && state._currentPhotos.length > 0) ? state._currentPhotos : (editing ? [...editing.photos] : []);
   state._currentPhotos = photos;
 
   page.innerHTML = `
@@ -1977,7 +1978,7 @@ function renderEntryPage() {
       <div class="form-group">
         <label>📷 照片（最多3张，第一张为封面）</label>
         <div class="photo-upload" id="photoUpload" style="margin-top:6px;"></div>
-        <div class="photo-hint">长按非首张照片可设为封面；拖拽可调整顺序；× 删除。相册支持一次选多张（最多3张）。</div>
+        <div class="photo-hint">连续点击2次非首张照片可设为封面；拖拽可调整顺序；× 删除。相册支持一次选多张（最多3张）。</div>
       </div>` : ''}
 
       <div class="entry-tabs">
@@ -2065,7 +2066,7 @@ function renderPhotoUpload() {
         ontouchstart="photoDragStart(${i},event)"
         onclick="onPhotoClick(${i})">
         <img src="${p}" style="width:100%;height:100%;object-fit:cover;">
-        ${i === 0 ? '<div class="cover-badge">封面</div>' : '<div class="cover-set">长按设为封面</div>'}
+        ${i === 0 ? '<div class="cover-badge">封面</div>' : '<div class="cover-set">双击设为封面</div>'}
         <div class="remove" onclick="removePhoto(${i});event.stopPropagation()">✕</div>
       </div>
     `).join('')}
@@ -2109,9 +2110,22 @@ function addPhoto(mode) {
   input.click();
 }
 
-// 单击照片：不设为封面（长按设为封面）
+// 单击照片：双击检测逻辑
+let lastClickTime = 0;
+let lastClickedIndex = -1;
 function onPhotoClick(index) {
-  // 长按设为封面，单击无操作
+  const now = Date.now();
+  if (index === lastClickedIndex && (now - lastClickTime) < 300) {
+    // 双击
+    if (index !== 0) {
+      setCover(index);
+    }
+    lastClickTime = 0;
+    lastClickedIndex = -1;
+  } else {
+    lastClickTime = now;
+    lastClickedIndex = index;
+  }
 }
 
 // 删除某张照片
@@ -2130,27 +2144,13 @@ function setCover(index) {
   showToast('已设为封面');
 }
 
-/* 问题3：拖动排序 —— 基于 Pointer Events 统一桌面/移动端，
-   用移动阈值区分"点击（设为封面）"与"拖动（排序）" */
+/* 拖动排序 —— 基于 Pointer Events 统一桌面/移动端 */
 let dragIdx = -1, dragStartX = 0, dragStartY = 0, dragEl = null, dragList = [], dragMoved = false;
-let longPressTimer = null;
-let longPressTriggered = false;
 
 function photoDragStart(i, ev) {
   // 仅响应主按钮 / 触摸
   if (ev.type === 'pointerdown' && ev.button !== 0) return;
-  dragIdx = i; dragMoved = false; longPressTriggered = false;
-  if (longPressTimer) clearTimeout(longPressTimer);
-  longPressTimer = setTimeout(() => {
-    longPressTriggered = true;
-    // 长按触发设为封面
-    setCover(dragIdx);
-    // 清理事件监听，因为页面会重新渲染
-    document.removeEventListener('touchmove', photoDragMove);
-    document.removeEventListener('touchend', photoDragEnd);
-    document.removeEventListener('pointermove', photoDragMove);
-    document.removeEventListener('pointerup', photoDragEnd);
-  }, 500);
+  dragIdx = i; dragMoved = false;
   dragList = Array.from(document.querySelectorAll('.photo-thumb.draggable'));
   dragEl = dragList[i];
   const t = ev.type === 'touchstart' ? ev.touches[0] : ev;
@@ -2169,12 +2169,7 @@ function photoDragMove(ev) {
   if (dragIdx < 0 || !dragEl) return;
   const t = ev.touches ? ev.touches[0] : ev;
   const dx = t.clientX - dragStartX, dy = t.clientY - dragStartY;
-  // 如果长按已触发，则不再处理拖动
-  if (longPressTriggered) return;
-  // 检测到移动超过阈值，清除长按定时器
-  if (!dragMoved && (Math.abs(dx) >= 5 || Math.abs(dy) >= 5)) {
-    if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
-  }
+  // 移动超过阈值才视为拖动
   if (!dragMoved && Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
   dragMoved = true;
   if (ev.cancelable) ev.preventDefault();
@@ -2199,18 +2194,11 @@ function photoDragMove(ev) {
 }
 
 function photoDragEnd() {
-  if (longPressTimer) clearTimeout(longPressTimer);
   document.removeEventListener('touchmove', photoDragMove);
   document.removeEventListener('touchend', photoDragEnd);
   document.removeEventListener('pointermove', photoDragMove);
   document.removeEventListener('pointerup', photoDragEnd);
   if (dragEl) dragEl.classList.remove('dragging');
-  // 如果长按已触发，不进行排序，直接结束
-  if (longPressTriggered) {
-    dragEl = null; dragIdx = -1; dragList = [];
-    return;
-  }
-  // 否则正常处理
   dragEl = null; dragIdx = -1; dragList = [];
   if (dragMoved) renderEntryPage();
 }
