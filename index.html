@@ -1,0 +1,4233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#FFB6C1">
+    <title>暖居收纳</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <style>
+        /* ========== 主题变量 ========== */
+:root {
+    --primary: #BE838E; /* 暮色粉 */
+    --primary-light: #FFD3DE;
+    --primary-dark: #D28C8D;
+    --bg: B56F72;
+    --card-bg: rgba(255, 255, 255, 0.85);
+    --text: #5D5451; 
+    --text-secondary: #A89F9B;
+    --border: rgba(190, 131, 142, 0.2);
+    --shadow: 0 8px 24px rgba(93, 84, 81, 0.05);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --nav-bg: rgba(251, 249, 248, 0.85);
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* 页面背景美化 */
+body {
+    background: radial-gradient(circle at top right, var(--bg), #EBE7E4);
+    color: var(--text);
+}
+
+/* 顶部栏毛玻璃 */
+.top-bar {
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    background: var(--nav-bg);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+}
+
+/* 增强型统计卡片 */
+.stat-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    transition: var(--transition);
+}
+.stat-card:active {
+    transform: scale(0.96) translateY(2px);
+}
+
+/* 拟态化物品卡片 */
+.item-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    transition: var(--transition);
+}
+.item-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+}
+
+/* 底部导航呼吸灯效果 */
+.nav-item .icon {
+    font-size: 24px;
+    transition: var(--transition);
+}
+.nav-item.active .icon {
+    transform: scale(1.25) translateY(-4px);
+    filter: drop-shadow(0 4px 8px var(--shadow));
+}
+
+/* AI 气泡优化 */
+.chat-msg.bot .chat-bubble {
+    background: #FFFFFF;
+    border-radius: 18px 18px 18px 4px;
+    box-shadow: 2px 4px 12px rgba(0,0,0,0.03);
+    border: 1px solid var(--border);
+}
+.chat-msg.user .chat-bubble {
+    background: var(--gradient);
+    border-radius: 18px 18px 4px 18px;
+    color: white;
+}
+
+/* 骨架屏载入感预览 */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.page.active > * {
+    animation: fadeIn 0.4s ease forwards;
+}
+.theme-sakura {
+    --primary: #BE838E; /* 粉 */
+    --primary-light: #FFD3DE;
+    --bg: #FFFAFB;
+    --border: #F1E1E1;
+    --gradient: linear-gradient(135deg, #BE838E, #FFD3DE);
+}
+.theme-yellow {
+    --primary: #D6B85B; /* 黄 */
+    --primary-light: #FFF3C0;
+    --bg: #FFFDF7;
+    --border: #F3EEDA;
+    --gradient: linear-gradient(135deg, #D6B85B, #FFF3C0);
+}
+.theme-blue {
+    --primary: #81A9CB; /* 蓝 */
+    --primary-light: #CAE6FF;
+    --bg: #F7FBFF;
+    --border: #D8E4F1;
+    --gradient: linear-gradient(135deg, #81A9CB, #CAE6FF);
+}
+.theme-green {
+    --primary: #819B78; /* 绿 */
+    --primary-light: #DCF0C9;
+    --bg: #F9FBF7;
+    --border: #E0E7E4;
+    --gradient: linear-gradient(135deg, #819B78, #DCF0C9);
+}
+.theme-purple {
+    --primary: #AD83BD; /* 紫 */
+    --primary-light: #ECCFF5;
+    --bg: #FAF7FB;
+    --border: #E8DEEE;
+    --gradient: linear-gradient(135deg, #AD83BD, #ECCFF5);
+}
+.theme-dark { 
+    --primary: #7C5A35; /* 咖 */
+    --primary-light: #EACFA7;
+    --bg: #F7F3F0;
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --text: #4E342E;
+    --text-secondary: #8D6E63;
+    --border: #DBC7BE;
+    --gradient: linear-gradient(135deg, #7C5A35, #EACFA7);
+}
+        /* ========== 全局样式 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #f0ecef 0%, #e8d5db 50%, #ddd0d4 100%);
+            overflow: hidden;
+        }
+        img {
+            max-width: 100%;
+        }
+
+        #app {
+            width: 100%;
+            height: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(145deg, #f0e8ec, #e5d0d8);
+        }
+        .phone {
+            width: 100%;
+            max-width: 440px;
+            height: 100vh;
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+            background: var(--bg);
+            transition: background .3s;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 60px rgba(0, 0, 0, .08);
+        }
+
+        /* ========== 顶部栏 ========== */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 14px;
+            padding-top: calc(8px + env(safe-area-inset-top));
+            background: var(--card-bg);
+            z-index: 100;
+            flex-shrink: 0;
+            box-shadow: 0 1px 12px rgba(0, 0, 0, .03);
+        }
+        .top-bar .left,
+        .top-bar .right {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all .2s;
+            font-size: 18px;
+            background: var(--bg);
+        }
+        .top-bar .left:hover,
+        .top-bar .right:hover {
+            background: var(--primary-light);
+            transform: scale(1.05);
+        }
+        .top-bar .left:active,
+        .top-bar .right:active {
+            transform: scale(.9);
+        }
+        .top-bar .center {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 3px 12px;
+            border-radius: 20px;
+            transition: all .3s;
+        }
+        .top-bar .center:active {
+            transform: scale(.92);
+        }
+        .logo-bear {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: var(--gradient);
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+        .app-name {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: .5px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ========== 页面容器 ========== */
+        .pages {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            min-height: 0;
+        }
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-bottom: calc(64px + env(safe-area-inset-bottom));
+            opacity: 0;
+            transform: translateX(20px);
+            pointer-events: none;
+            transition: opacity .4s ease, transform .4s ease;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .page.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+        }
+        .page::-webkit-scrollbar {
+            display: none;
+        }
+        .page.no-page-pad {
+            padding-bottom: 0;
+        }
+        #page-entry {
+            padding-bottom: calc(56px + env(safe-area-inset-bottom));
+        }
+
+        /* ========== 统计卡片 ========== */
+        .stats-row {
+            display: flex;
+            gap: 10px;
+            padding: 12px 16px;
+        }
+        .stat-card {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 16px 10px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, .6);
+            position: relative;
+            overflow: hidden;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .stat-card:active {
+            transform: scale(.97);
+        }
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            opacity: .3;
+        }
+        .stat-card .value {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -.5px;
+            font-variant-numeric: tabular-nums;
+        }
+        .stat-card .label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        /* ========== 搜索框 ========== */
+        .search-box {
+            margin: 2px 16px 10px;
+            background: var(--card-bg);
+            border-radius: 25px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, .03), 0 0 0 1px var(--border) inset;
+            border: none;
+            transition: box-shadow .2s;
+        }
+        .search-box:focus-within {
+            box-shadow: 0 2px 16px var(--shadow), 0 0 0 1.5px var(--primary) inset;
+        }
+        .search-box input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            background: transparent;
+            color: var(--text);
+        }
+        .search-box input::placeholder {
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+
+        /* ========== 标题 ========== */
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+            padding: 4px 16px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: .3px;
+        }
+
+        /* ========== 房间标签 ========== */
+        .room-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 0 16px 14px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .room-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        .room-tab {
+            padding: 8px 20px;
+            border-radius: 22px;
+            font-size: 14px;
+            font-weight: 600;
+            background: var(--card-bg);
+            border: 1.5px solid var(--border);
+            color: var(--text-secondary);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all .25s ease;
+            flex-shrink: 0;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .02);
+        }
+        .room-tab:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .room-tab.active {
+            background: var(--gradient);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+
+        /* ========== 家具卡片 ========== */
+        .furniture-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            padding: 0 16px;
+        }
+        .furniture-card {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 20px 14px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, .8);
+            transition: all .25s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+        .furniture-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--primary-light);
+            opacity: 0;
+            transition: opacity .3s;
+            pointer-events: none;
+        }
+        .furniture-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+        }
+        .furniture-card:hover::before {
+            opacity: .3;
+        }
+        .furniture-card:active {
+            transform: scale(.93);
+        }
+        .furniture-card .icon {
+            font-size: 36px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .1));
+        }
+        .furniture-card .name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .furniture-card .count {
+            font-size: 11px;
+            color: var(--text-secondary);
+            background: var(--bg);
+            padding: 2px 10px;
+            border-radius: 10px;
+        }
+
+        /* ========== 底部导航 ========== */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: calc(56px + env(safe-area-inset-bottom));
+            flex: 0 0 auto;
+            display: flex;
+            align-items: stretch;
+            justify-content: space-around;
+            padding: 0 6px;
+            padding-bottom: env(safe-area-inset-bottom);
+            background: var(--nav-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, .3);
+            z-index: 100;
+            box-sizing: border-box;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, .02);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            cursor: pointer;
+            position: relative;
+            padding: 6px 2px;
+            flex: 1 1 0;
+            min-width: 0;
+            opacity: .55;
+            filter: saturate(.7);
+            transition: all .3s ease;
+        }
+        .nav-item .icon {
+            font-size: 22px;
+            line-height: 1;
+            transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), filter .3s;
+        }
+        .nav-item .label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            line-height: 1.2;
+            font-weight: 500;
+        }
+        .nav-item.active {
+            opacity: 1;
+            filter: none;
+        }
+        .nav-item.active .icon {
+            transform: scale(1.2) translateY(-1px);
+            filter: drop-shadow(0 2px 6px var(--shadow));
+        }
+        .nav-item.active .label {
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .nav-item:active {
+            opacity: 1;
+            transform: scale(.92);
+        }
+        .nav-badge {
+            position: absolute;
+            top: 4px;
+            right: calc(50% - 24px);
+            background: #FF4757;
+            color: #fff;
+            font-size: 9px;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            padding: 0 4px;
+            line-height: 1;
+            box-shadow: 0 2px 6px rgba(255, 71, 87, .4);
+        }
+        .nav-badge.has-count {
+            right: calc(50% - 26px);
+        }
+
+        .fab-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #fff;
+            box-shadow: 0 4px 20px var(--shadow), 0 0 0 2px rgba(255, 255, 255, .5) inset;
+            cursor: pointer;
+            transition: all .3s cubic-bezier(.34, 1.56, .64, 1);
+            margin-top: -18px;
+            flex-shrink: 0;
+            line-height: 1;
+            border: none;
+        }
+        .fab-btn:hover {
+            transform: scale(1.08) rotate(90deg);
+        }
+        .fab-btn:active {
+            transform: scale(.85) rotate(90deg);
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        /* ========== 侧边菜单 ========== */
+        .side-menu-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, .3);
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .3s;
+            backdrop-filter: blur(2px);
+        }
+        .side-menu-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .side-menu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 78%;
+            height: 100%;
+            background: var(--card-bg);
+            z-index: 201;
+            transform: translateX(-100%);
+            transition: transform .35s cubic-bezier(.3, 0, 0, 1);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, .1);
+        }
+        .side-menu.open {
+            transform: translateX(0);
+        }
+        .menu-header {
+            padding: 44px 20px 20px;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: relative;
+        }
+        .menu-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(transparent, var(--card-bg));
+        }
+        .menu-header .logo-bear {
+            width: 46px;
+            height: 46px;
+            font-size: 28px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .1);
+        }
+        .menu-header .info h3 {
+            font-size: 18px;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+        }
+        .menu-header .info p {
+            font-size: 12px;
+            color: rgba(255, 255, 255, .8);
+        }
+        .menu-list {
+            padding: 12px 10px;
+            flex: 1;
+        }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all .2s;
+            font-size: 15px;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+        .menu-item:hover {
+            background: var(--primary-light);
+            transform: translateX(4px);
+        }
+        .menu-item:active {
+            background: var(--primary-light);
+            transform: scale(.97);
+        }
+        .menu-item .micon {
+            font-size: 22px;
+            width: 28px;
+            text-align: center;
+        }
+        .menu-item .mtext {
+            flex: 1;
+            font-weight: 500;
+        }
+        .menu-item .marrow {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        .menu-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 8px 16px;
+        }
+
+        /* ========== 筛选栏 ========== */
+        .filter-bar {
+            padding: 10px 16px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .filter-bar::-webkit-scrollbar {
+            display: none;
+        }
+        .filter-chip {
+            padding: 6px 14px;
+            border-radius: 18px;
+            font-size: 13px;
+            white-space: nowrap;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all .2s;
+            font-weight: 500;
+        }
+        .filter-chip:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .filter-chip.active,
+        .filter-chip.selected {
+            background: var(--gradient);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+
+        /* ========== 物品卡片 ========== */
+        .item-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            padding: 0 16px 20px;
+        }
+        .items-toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            padding: 12px 16px 8px;
+            background: linear-gradient(180deg, var(--bg) 80%, transparent);
+        }
+        .items-toolbar .search-box {
+            margin-bottom: 10px;
+        }
+        .items-toolbar .filter-bar {
+            padding: 4px 0 6px;
+            flex-wrap: wrap;
+        }
+        .item-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, .7);
+            transition: all .25s ease;
+            position: relative;
+        }
+        .item-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+        }
+        .item-card:active {
+            transform: scale(.96);
+        }
+        .item-card .expire-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            z-index: 2;
+            color: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .15);
+        }
+        .expire-badge.urgent {
+            background: linear-gradient(135deg, #FF4757, #FF6B81);
+        }
+        .expire-badge.soon {
+            background: linear-gradient(135deg, #FFA502, #FFB347);
+        }
+        .item-card .photo {
+            width: 100%;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            background: var(--primary-light);
+            position: relative;
+            overflow: hidden;
+        }
+        .item-card .photo::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, .03));
+        }
+        .item-card .info {
+            padding: 12px 12px 10px;
+        }
+        .item-card .name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .item-card .meta {
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .item-card .meta span {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* ========== 录入页 ========== */
+        .entry-tabs {
+            display: flex;
+            gap: 12px;
+            padding: 14px 16px;
+        }
+        .entry-tab {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 18px 8px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, .7);
+            transition: all .2s;
+        }
+        .entry-tab:active {
+            transform: scale(.93);
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+        .entry-tab .eicon {
+            font-size: 32px;
+        }
+        .entry-tab .etext {
+            font-size: 12px;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .form-group {
+            padding: 0 16px 12px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            font-size: 14px;
+            background: var(--card-bg);
+            color: var(--text);
+            outline: none;
+            transition: all .2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .02) inset;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--shadow), 0 1px 3px rgba(0, 0, 0, .02) inset;
+        }
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .photo-upload {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .photo-thumb {
+            width: 72px;
+            height: 72px;
+            border-radius: 14px;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: var(--primary-light);
+            cursor: grab;
+            position: relative;
+            overflow: hidden;
+            touch-action: none;
+            transition: all .2s;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, .05);
+        }
+        .photo-thumb img {
+            pointer-events: none;
+        }
+        .photo-thumb.dragging {
+            opacity: .5;
+            cursor: grabbing;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .1);
+        }
+        .cover-badge {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background: var(--gradient);
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            text-align: center;
+            padding: 2px 0;
+            line-height: 1.4;
+        }
+        .cover-set {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, .4);
+            color: #fff;
+            font-size: 9px;
+            font-weight: 600;
+            text-align: center;
+            padding: 2px 0;
+            line-height: 1.4;
+            opacity: 0;
+            transition: opacity .15s;
+            backdrop-filter: blur(2px);
+        }
+        .photo-thumb:hover .cover-set,
+        .photo-thumb:active .cover-set {
+            opacity: 1;
+        }
+        .photo-thumb.is-cover {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+        .photo-thumb .remove {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 20px;
+            height: 20px;
+            background: rgba(0, 0, 0, .5);
+            color: #fff;
+            border-radius: 50%;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+            backdrop-filter: blur(2px);
+        }
+        .photo-thumb.add {
+            border: 2px dashed var(--primary);
+            color: var(--primary);
+            font-size: 30px;
+            cursor: pointer;
+            background: transparent;
+        }
+        .photo-hint {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin: 6px 16px 0;
+            line-height: 1.5;
+        }
+
+        .chip-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .chip {
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            background: var(--card-bg);
+            border: 1.5px solid var(--border);
+            color: var(--text);
+            cursor: pointer;
+            transition: all .2s;
+            font-weight: 500;
+        }
+        .chip:hover {
+            border-color: var(--primary);
+        }
+        .chip.selected {
+            background: var(--gradient);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            position: sticky;
+            bottom: 0;
+            background: linear-gradient(transparent, var(--bg) 30%);
+        }
+
+        .entry-form-actions {
+            position: sticky;
+            bottom: 0;
+            display: flex;
+            gap: 10px;
+            padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+            margin-top: 8px;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+        .btn-cancel,
+        .btn-save {
+            flex: 1;
+            padding: 12px 8px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            line-height: 1.2;
+            transition: all .2s;
+        }
+        .btn-cancel {
+            background: var(--bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+        .btn-cancel:hover {
+            background: #f5f5f5;
+        }
+        .btn-save {
+            background: var(--gradient);
+            color: #fff;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+        .btn-save:hover {
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+        .entry-form-actions .btn-save+.btn-save {
+            background: var(--card-bg);
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+        }
+        .btn-cancel:active,
+        .btn-save:active {
+            transform: scale(.95);
+        }
+
+        /* ========== AI聊天 ========== */
+/* 优化后的顶部API配置栏 */
+.chat-api-settings {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    gap: 8px;
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.chat-api-settings .model-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.chat-api-settings .model-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-api-settings .status-tag {
+    display: inline-flex;
+    align-items: center;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 6px;
+    margin-top: 2px;
+    width: fit-content;
+}
+
+.status-tag.ready {
+    background: #E8F5E9;
+    color: #2E7D32;
+}
+
+.status-tag.wait {
+    background: #FFF3E0;
+    color: #EF6C00;
+}
+
+.chat-api-settings .action-btns {
+    display: flex;
+    gap: 6px;
+}
+
+.chat-api-settings .set-btn {
+    padding: 6px 12px;
+    border-radius: 10px;
+    border: none;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    background: var(--primary-light);
+    color: var(--primary-dark);
+}
+
+.chat-api-settings .set-btn.clear {
+    background: #F5F5F5;
+    color: #757575;
+}
+
+.chat-api-settings .set-btn:active {
+    transform: scale(0.92);
+}
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding-bottom: 0;
+            min-height: 0;
+        }
+        #page-ai {
+            padding-bottom: 0;
+            overflow: hidden;
+        }
+        #page-ai .chat-container {
+            padding-bottom: calc(56px + env(safe-area-inset-bottom));
+            box-sizing: border-box;
+        }
+        .chat-messages {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 16px;
+            padding-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            min-height: 0;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            background: linear-gradient(180deg, var(--bg) 0%, var(--bg) 50%, rgba(0, 0, 0, .01));
+        }
+        .chat-messages::-webkit-scrollbar {
+            display: none;
+        }
+        .chat-msg {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            max-width: 85%;
+            animation: fadeInUp .3s ease;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .chat-msg.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        .chat-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            line-height: 1;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+        }
+        .chat-msg.bot .chat-avatar {
+            background: var(--gradient);
+        }
+        .chat-msg.user .chat-avatar {
+            background: var(--primary-light);
+        }
+        .chat-bubble {
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text);
+            word-break: break-word;
+        }
+        .chat-msg.bot .chat-bubble {
+            background: var(--card-bg);
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .03), 0 0 0 1px var(--border) inset;
+        }
+        .chat-msg.user .chat-bubble {
+            background: var(--gradient);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+        .chat-msg .chat-bubble img {
+            max-width: 100%;
+            border-radius: 10px;
+            display: block;
+            margin-top: 4px;
+        }
+        .chat-attach-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 8px 12px 0;
+        }
+        .chat-attach-preview .thumb {
+            position: relative;
+            width: 52px;
+            height: 52px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .05);
+        }
+        .chat-attach-preview .thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .chat-attach-preview .thumb .rm {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ff4d4f;
+            color: #fff;
+            font-size: 11px;
+            line-height: 18px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(255, 77, 79, .3);
+        }
+        .chat-quickbar {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            gap: 6px;
+            padding: 8px 12px;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+            scrollbar-width: none;
+        }
+        .chat-quickbar::-webkit-scrollbar {
+            display: none;
+        }
+        .quick-chip {
+            padding: 5px 12px;
+            border-radius: 16px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 11px;
+            border: 1px solid rgba(255, 138, 159, .3);
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: all .2s;
+            font-weight: 500;
+        }
+        .quick-chip:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+        .chat-input-bar {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
+            background: var(--card-bg);
+            border-top: 1px solid var(--border);
+            align-items: flex-end;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+        .chat-input-bar .input-wrap {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 0;
+        }
+        .chat-input-bar .tool-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg);
+            color: var(--primary);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-bottom: 1px;
+            transition: all .2s;
+        }
+        .chat-input-bar .tool-btn:active {
+            background: var(--primary-light);
+            transform: scale(.9);
+        }
+        .chat-input-bar textarea {
+            width: 100%;
+            min-height: 38px;
+            max-height: 90px;
+            resize: none;
+            padding: 10px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 22px;
+            font-size: 14px;
+            outline: none;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.4;
+            box-sizing: border-box;
+            font-family: inherit;
+            transition: all .2s;
+        }
+        .chat-input-bar textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--shadow);
+        }
+        .chat-send-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient);
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all .2s;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+        .chat-send-btn:hover {
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+        .chat-send-btn:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* ========== 统计页 ========== */
+        .stats-overview {
+            padding: 16px;
+        }
+        .big-stat {
+            background: var(--gradient);
+            border-radius: 20px;
+            padding: 28px;
+            text-align: center;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        .big-stat::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .15);
+        }
+        .big-stat::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: -20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .08);
+        }
+        .big-stat .val {
+            font-size: 40px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -1px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, .1);
+        }
+        .big-stat .lbl {
+            font-size: 14px;
+            color: rgba(255, 255, 255, .9);
+            margin-top: 6px;
+        }
+        .stats-chart {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 14px;
+            border: 1px solid rgba(255, 255, 255, .7);
+            box-shadow: var(--card-shadow);
+        }
+        .stats-chart h4 {
+            font-size: 14px;
+            margin-bottom: 14px;
+            color: var(--text);
+        }
+        .chart-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .chart-bar-label {
+            width: 80px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: right;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .chart-bar-track {
+            flex: 1;
+            height: 22px;
+            background: var(--bg);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .chart-bar-fill {
+            height: 100%;
+            border-radius: 12px;
+            background: var(--gradient);
+            transition: width .6s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .05) inset;
+        }
+        .chart-bar-fill span {
+            font-size: 10px;
+            color: var(--text);
+            font-weight: 600;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .stats-mini-card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, .7);
+            box-shadow: var(--card-shadow);
+            transition: transform .2s;
+        }
+        .stats-mini-card:hover {
+            transform: translateY(-2px);
+        }
+        .stats-mini-card .v {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary);
+            font-variant-numeric: tabular-nums;
+        }
+        .stats-mini-card .l {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        /* ========== 提醒页 ========== */
+        .reminder-section {
+            margin-bottom: 16px;
+        }
+        .reminder-section .sec-header {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .reminder-list {
+            padding: 0 16px;
+        }
+        .reminder-item {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid rgba(255, 255, 255, .7);
+            box-shadow: var(--card-shadow);
+            transition: transform .2s;
+        }
+        .reminder-item:hover {
+            transform: translateX(4px);
+        }
+        .reminder-item .rphoto {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: var(--primary-light);
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .reminder-item .rphoto img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+        .reminder-item .rinfo {
+            flex: 1;
+        }
+        .reminder-item .rname {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .reminder-item .rtime {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        .reminder-item .rstatus {
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            flex-shrink: 0;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .05);
+        }
+        .rstatus.expired {
+            background: #FFE0E3;
+            color: #FF4757;
+        }
+        .rstatus.urgent {
+            background: #FFF3CD;
+            color: #FFA502;
+        }
+        .rstatus.soon {
+            background: #D4EDDA;
+            color: #28A745;
+        }
+        .reminder-item .ractions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .reminder-item .ractions button {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            transition: all .2s;
+        }
+        .reminder-item .ractions .btn-read:hover {
+            background: var(--primary-light);
+            transform: scale(1.1);
+        }
+        .reminder-item .ractions .btn-del:hover {
+            background: #FFE0E3;
+            transform: scale(1.1);
+        }
+        .reminder-item.read {
+            opacity: .5;
+        }
+        .reminder-actions {
+            display: flex;
+            gap: 8px;
+            padding: 0 16px 12px;
+        }
+        .reminder-actions .btn {
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all .2s;
+        }
+        .btn-read-all {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+        .btn-del-all {
+            background: #FFE0E3;
+            color: #FF4757;
+        }
+
+        /* ========== 主题页 ========== */
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            padding: 16px;
+        }
+        .theme-card {
+            border-radius: 16px;
+            padding: 16px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all .2s;
+            position: relative;
+            overflow: hidden;
+            background: var(--card-bg);
+            box-shadow: var(--card-shadow);
+        }
+        .theme-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+        }
+        .theme-card.selected {
+            border-color: var(--primary);
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+        .theme-card .preview {
+            height: 50px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, .05);
+        }
+        .theme-card .tname {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* ========== 导入导出 ========== */
+        .import-export-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 16px;
+        }
+        .ie-btn {
+            padding: 16px 18px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            transition: all .2s;
+        }
+        .ie-btn.export {
+            background: var(--gradient);
+            color: #fff;
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+        .ie-btn.import {
+            background: var(--card-bg);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        .ie-btn.template {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+        .ie-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        /* ========== 详情页 ========== */
+        .item-detail-photo {
+            width: 100%;
+            aspect-ratio: 4/3;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            background: var(--primary-light);
+            margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+        .item-detail-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .detail-row {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        .detail-row .dl {
+            color: var(--text-secondary);
+            width: 90px;
+            flex-shrink: 0;
+            font-weight: 500;
+        }
+        .detail-row .dv {
+            color: var(--text);
+            flex: 1;
+        }
+
+        /* ========== 模态框 ========== */
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, .4);
+            z-index: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .25s;
+            backdrop-filter: blur(4px);
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 20px;
+            width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+            padding: 24px;
+            transform: scale(.85);
+            transition: transform .3s cubic-bezier(.34, 1.56, .64, 1);
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, .15);
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        /* ========== Toast ========== */
+        .toast {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(.8);
+            background: var(--card-bg);
+            color: var(--text);
+            padding: 14px 28px;
+            border-radius: 26px;
+            font-size: 15px;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .1);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            z-index: 500;
+            opacity: 0;
+            pointer-events: none;
+            transition: all .35s cubic-bezier(.68, -.55, .27, 1.55);
+            white-space: nowrap;
+        }
+        .toast.active {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* ========== 欢迎动画 ========== */
+        .welcome-toast {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(.8);
+            background: var(--gradient);
+            color: #fff;
+            padding: 16px 30px;
+            border-radius: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, .15);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            border: 1px solid rgba(255, 255, 255, .3);
+            pointer-events: none;
+            opacity: 0;
+            transition: all .4s ease;
+        }
+        .welcome-toast.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        .welcome-bear {
+            font-size: 26px;
+            animation: bounce 1.2s infinite;
+        }
+        @keyframes bounce {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        /* ========== 空状态 ========== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        .empty-state .emoji {
+            font-size: 52px;
+            margin-bottom: 14px;
+            filter: grayscale(.3);
+        }
+        .empty-state .text {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* ========== 设置页 ========== */
+        .settings-group {
+            padding: 0 16px 16px;
+        }
+        .settings-group h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            padding: 10px 0 8px;
+        }
+        .settings-check-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            margin-bottom: 6px;
+            border: 1px solid var(--border);
+            box-shadow: var(--card-shadow);
+        }
+        .settings-check-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary);
+        }
+
+        /* ========== 子页面头部 ========== */
+        .sub-page-header {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            gap: 10px;
+            flex-shrink: 0;
+            box-shadow: 0 1px 8px rgba(0, 0, 0, .02);
+        }
+        .sub-page-header .back-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            border: none;
+            background: var(--bg);
+            transition: all .2s;
+        }
+        .sub-page-header .back-btn:active {
+            background: var(--primary-light);
+            transform: scale(.9);
+        }
+        .sub-page-header h2 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        /* ========== 录入页头部 ========== */
+        .entry-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            box-shadow: 0 1px 8px rgba(0, 0, 0, .02);
+        }
+        .entry-header .back-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            border: none;
+            background: var(--bg);
+            transition: all .2s;
+        }
+        .entry-header h2 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="phone" id="phone"></div>
+    </div>
+
+    <script>
+        // ========== 全局状态 ==========
+        const state = {
+            currentPage: 'home',
+            currentNav: 'home',
+            currentTheme: 'theme-sakura',
+            currentRoom: '客厅',
+            selectedFurniture: null,
+            unreadCount: 0,
+            apiKey: localStorage.getItem('deepseek_api_key') || '',
+            apiBase: localStorage.getItem('deepseek_api_base') || 'https://api.deepseek.com/v1',
+            aiModel: localStorage.getItem('deepseek_model') || 'deepseek-chat',
+            settings: {
+                cardFields: { photo: true, name: false, price: false, quantity: true, purchaseDate: true, expireDate: true,
+                    openDate: false, openUseDays: false, dailyPrice: true, room: true, furniture: true, category: true,
+                    status: true, tags: true, notes: false },
+                formFields: { photo: true, name: true, price: true, quantity: true, purchaseDate: true, expireDate: true,
+                    openDate: false, openUseDays: false, dailyPrice: false, room: true, furniture: true, category: true,
+                    status: true, tags: true, notes: true },
+                showEmoji: true
+            },
+            rooms: [
+                { id: 1, name: '🛋️ 客厅', furniture: [{ id: 101, name: '📺 电视柜', icon: '📺' }, { id: 102, name: '🎨 展示柜',
+                        icon: '🎨' }] },
+                { id: 2, name: '🛏️ 卧室', furniture: [{ id: 201, name: '🚪 衣柜', icon: '🚪' }, { id: 202, name: '🧴 梳妆台',
+                        icon: '🧴' }] },
+                { id: 3, name: '🍳 厨房', furniture: [{ id: 301, name: '🧊 冰箱', icon: '🧊' }, { id: 302, name: '🍶 调料架',
+                        icon: '🍶' }] },
+                { id: 4, name: '🚿 卫生间', furniture: [{ id: 401, name: '🧴 洗漱台', icon: '🧴' }, { id: 402, name: '🧻 储物柜',
+                        icon: '🧻' }] }
+            ],
+            categories: ['📱 数码产品', '🛋️ 家居用品', '💄 美妆护肤', '👗 服饰鞋包', '💊 药品保健', '🍜 食品饮料', '📚 书籍文具', '🧸 玩具手办'],
+            tags: ['夏装', '冬装', '常用', '贵重', '礼物', '备用', '旅行', '工作'],
+            statuses: ['✅ 在用', '💤 闲置', '⚠️ 破损', '🎁 送人', '💰 卖出'],
+            items: [],
+            reminders: [],
+            ignoredReminderIds: [],
+            filterType: 'all',
+            searchKeyword: '',
+            editingItem: null,
+            selectedTags: [],
+            _currentPhotos: []
+        };
+
+        // ========== 工具函数 ==========
+        const $ = (sel) => document.querySelector(sel);
+        const $$ = (sel) => document.querySelectorAll(sel);
+        const getEl = () => document.getElementById('phone');
+
+        // HTML转义，防止XSS
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // 获取展示名称（可选择性去除emoji前缀）
+        function getDisplayName(name) {
+            if (!name) return '';
+            if (!state.settings.showEmoji) {
+                const emojiRegex =
+                    /^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}\u{2B00}-\u{2BFF}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}]+/u;
+                const result = String(name).replace(emojiRegex, '').replace(/^\s+/, '');
+                return result || name;
+            }
+            return name;
+        }
+
+        function daysUntil(dateStr) {
+            if (!dateStr) return null;
+            const d = new Date(dateStr);
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            d.setHours(0, 0, 0, 0);
+            return Math.ceil((d - now) / 86400000);
+        }
+
+        function calcDailyPrice(item) {
+            if (!item.price || !item.purchaseDate) return 0;
+            const days = Math.max(1, -daysUntil(item.purchaseDate));
+            let useDays = 365;
+            if (item.openUseDays) useDays = item.openUseDays;
+            return (item.price * item.quantity / useDays).toFixed(2);
+        }
+
+        function showToast(msg) {
+            let t = $('.toast');
+            if (!t) {
+                t = document.createElement('div');
+                t.className = 'toast';
+                getEl().appendChild(t);
+            }
+            t.textContent = msg;
+            t.classList.add('active');
+            setTimeout(() => t.classList.remove('active'), 1800);
+        }
+
+        function showWelcome() {
+            const el = document.createElement('div');
+            el.className = 'welcome-toast';
+            el.innerHTML = '<div class="welcome-bear">🐻</div><div>欢迎回家 哈尼</div>';
+            getEl().appendChild(el);
+            setTimeout(() => el.classList.add('show'), 100);
+            setTimeout(() => {
+                el.classList.remove('show');
+                setTimeout(() => el.remove(), 400);
+            }, 1200);
+        }
+
+        // ========== 数据持久化 ==========
+        let saveTimer = null;
+
+        function saveState() {
+            if (saveTimer) clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => forceSave(), 200);
+        }
+
+        function forceSave() {
+            const data = {
+                items: state.items,
+                rooms: state.rooms,
+                categories: state.categories,
+                tags: state.tags,
+                statuses: state.statuses,
+                currentRoom: state.currentRoom,
+                currentTheme: state.currentTheme,
+                settings: state.settings,
+                aiModel: state.aiModel,
+                apiKey: state.apiKey,
+                apiBase: state.apiBase,
+                reminders: state.reminders,
+                ignoredReminderIds: state.ignoredReminderIds
+            };
+            localStorage.setItem('nuanju_state', JSON.stringify(data));
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem('nuanju_state');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    if (data.items) state.items = data.items;
+                    if (data.rooms) state.rooms = data.rooms;
+                    if (data.categories) state.categories = data.categories;
+                    if (data.tags) state.tags = data.tags;
+                    if (data.statuses) state.statuses = data.statuses;
+                    if (data.currentRoom) state.currentRoom = data.currentRoom;
+                    if (data.currentTheme) state.currentTheme = data.currentTheme;
+                    if (data.settings) {
+                        state.settings = {
+                            ...state.settings,
+                            ...data.settings,
+                            cardFields: { ...state.settings.cardFields, ...(data.settings.cardFields || {}) },
+                            formFields: { ...state.settings.formFields, ...(data.settings.formFields || {}) },
+                            showEmoji: data.settings.showEmoji !== undefined ? data.settings.showEmoji : true
+                        };
+                    }
+                    if (data.reminders) state.reminders = data.reminders;
+                    if (data.ignoredReminderIds) state.ignoredReminderIds = data.ignoredReminderIds;
+                    if (data.aiModel) state.aiModel = data.aiModel;
+                    if (data.apiKey !== undefined) state.apiKey = data.apiKey;
+                    if (data.apiBase) state.apiBase = data.apiBase;
+                } catch (e) {
+                    console.warn('本地数据解析失败，使用默认数据', e);
+                }
+            }
+        }
+
+        // ========== 提醒生成 ==========
+        function generateReminders() {
+            const oldReminders = state.reminders || [];
+            const oldReadMap = {};
+            oldReminders.forEach(r => { oldReadMap[r.itemId] = r.read; });
+            const list = [];
+            state.items.forEach(item => {
+                if (state.ignoredReminderIds && state.ignoredReminderIds.includes(item.id)) return;
+                if (!item.expireDate) return;
+                const days = daysUntil(item.expireDate);
+                if (days === null) return;
+                if (days < 0) {
+                    list.push({ itemId: item.id, name: item.name, days, status: 'expired', read: oldReadMap[item
+                            .id] || false, photo: item.photos && item.photos[0] ? '' : item.category.split(' ')[
+                            0
+                        ], photoUrl: item.photos && item.photos[0] ? item.photos[0] : '', room: item.room,
+                        furniture: item.furniture });
+                } else if (days <= 15) {
+                    list.push({ itemId: item.id, name: item.name, days, status: days <= 7 ? 'urgent' : 'soon',
+                        read: oldReadMap[item.id] || false, photo: item.photos && item.photos[0] ? '' : item
+                            .category.split(' ')[0], photoUrl: item.photos && item.photos[0] ? item.photos[0] :
+                            '', room: item.room, furniture: item.furniture });
+                }
+            });
+            list.sort((a, b) => a.days - b.days);
+            state.reminders = list;
+            updateBadge();
+        }
+
+        function updateBadge() {
+            state.unreadCount = state.reminders.filter(r => !r.read).length;
+            const badge = $('.nav-badge');
+            if (badge) {
+                badge.textContent = state.unreadCount > 99 ? '99+' : state.unreadCount;
+                badge.style.display = state.unreadCount > 0 ? 'flex' : 'none';
+            }
+        }
+
+       // ========== 主题配置 ==========
+        const themes = [
+            { key: 'theme-sakura', name: '柔粉晚霞', gradient: 'linear-gradient(135deg, #BE838E, #FFD3DE)' },
+            { key: 'theme-yellow', name: '银杏暖阳', gradient: 'linear-gradient(135deg, #D6B85B, #FFF3C0)' },
+            { key: 'theme-blue', name: '清透雾蓝', gradient: 'linear-gradient(135deg, #81A9CB, #CAE6FF)' },
+            { key: 'theme-green', name: '薄荷森林', gradient: 'linear-gradient(135deg, #819B78, #DCF0C9)' },
+            { key: 'theme-purple', name: '丁香迷雾', gradient: 'linear-gradient(135deg, #AD83BD, #ECCFF5)' },
+            { key: 'theme-dark', name: '醇香奶咖', gradient: 'linear-gradient(135deg, #7C5A35, #EACFA7)' },
+        ];
+
+        function applyTheme(themeKey) {
+            state.currentTheme = themeKey;
+            const phone = document.getElementById('phone');
+            phone.className = 'phone ' + themeKey;
+            localStorage.setItem('theme', themeKey);
+        }
+
+        function randomTheme() {
+            const available = themes.filter(t => t.key !== state.currentTheme);
+            const next = available[Math.floor(Math.random() * available.length)];
+            applyTheme(next.key);
+            showToast('已切换: ' + next.name);
+            saveState();
+        }
+
+        // ========== 渲染函数 ==========
+        function renderApp() {
+            const html = `
+            <div class="top-bar" id="topBar"></div>
+            <div class="pages" id="pages"></div>
+            <div class="bottom-nav" id="bottomNav"></div>
+            <div class="side-menu-overlay" id="menuOverlay" onclick="closeMenuAndGoHome()"></div>
+            <div class="side-menu" id="sideMenu"></div>
+          `;
+            getEl().innerHTML = html;
+            applyTheme(localStorage.getItem('theme') || 'theme-sakura');
+            renderTopBar();
+            renderPages();
+            renderBottomNav();
+            renderSideMenu();
+            generateReminders();
+            showPage('home');
+        }
+
+        function renderTopBar() {
+            const bar = $('#topBar');
+            bar.innerHTML = `
+            <div class="left" onclick="toggleMenu()">☰</div>
+            <div class="center" onclick="randomTheme()" title="点击切换主题">
+              <div class="logo-bear">🐻</div>
+              <span class="app-name">暖居收纳</span>
+            </div>
+            <div class="right" onclick="openSettings()">⚙️</div>
+          `;
+        }
+
+        function renderBottomNav() {
+            const nav = $('#bottomNav');
+            const cur = state.currentNav || 'home';
+            const badge = state.unreadCount > 99 ? '99+' : state.unreadCount;
+            nav.innerHTML = `
+            <div class="nav-item ${cur === 'home' ? 'active' : ''}" onclick="bottomNavTo('home')">
+              <span class="icon">🏠</span><span class="label">首页</span>
+            </div>
+            <div class="nav-item ${cur === 'reminders' ? 'active' : ''}" onclick="bottomNavTo('reminders')" style="position:relative;">
+              <span class="icon">🔔</span><span class="label">提醒</span>
+              <span class="nav-badge ${state.unreadCount > 99 ? 'has-count' : ''}" style="display:${state.unreadCount > 0 ? 'flex' : 'none'}">${badge}</span>
+            </div>
+            <div class="fab-btn" onclick="openEntry()">＋</div>
+            <div class="nav-item ${cur === 'ai' ? 'active' : ''}" onclick="bottomNavTo('ai')">
+              <span class="icon">🐻</span><span class="label">暖居小兜</span>
+            </div>
+            <div class="nav-item ${cur === 'items' ? 'active' : ''}" onclick="bottomNavTo('items')">
+              <span class="icon">📋</span><span class="label">清单</span>
+            </div>
+          `;
+        }
+
+        function bottomNavTo(key) {
+            showPage(key);
+        }
+
+        function renderSideMenu() {
+            const menu = $('#sideMenu');
+            menu.innerHTML = `
+            <div class="menu-header">
+              <div class="logo-bear">🐻</div>
+              <div class="info"><h3>暖居收纳</h3><p>让每一件物品都有归属</p></div>
+            </div>
+            <div class="menu-list">
+              <div class="menu-item" onclick="navigateTo('home')"><span class="micon">🏠</span><span class="mtext">我的小家</span><span class="marrow">›</span></div>
+              <div class="menu-item" onclick="navigateTo('items')"><span class="micon">📦</span><span class="mtext">物品清单</span><span class="marrow">›</span></div>
+              <div class="menu-item" onclick="navigateTo('stats')"><span class="micon">📊</span><span class="mtext">资产统计</span><span class="marrow">›</span></div>
+              <div class="menu-item" onclick="navigateTo('reminders')"><span class="micon">⏰</span><span class="mtext">到期提醒</span><span class="marrow">›</span></div>
+              <div class="menu-divider"></div>
+              <div class="menu-item" onclick="navigateTo('rooms')"><span class="micon">🏡</span><span class="mtext">空间管理</span><span class="marrow">›</span></div>
+              <div class="menu-item" onclick="navigateTo('tags')"><span class="micon">🏷️</span><span class="mtext">标签管理</span><span class="marrow">›</span></div>
+              <div class="menu-item" onclick="navigateTo('theme')"><span class="micon">🎨</span><span class="mtext">主题焕新</span><span class="marrow">›</span></div>
+              <div class="menu-item" onclick="navigateTo('import')"><span class="micon">📥</span><span class="mtext">导入导出</span><span class="marrow">›</span></div>
+              <div class="menu-divider"></div>
+              <div class="menu-item" onclick="navigateTo('settings')"><span class="micon">⚙️</span><span class="mtext">设置</span><span class="marrow">›</span></div>
+            </div>
+          `;
+        }
+
+        function renderPages() {
+            const container = $('#pages');
+            container.innerHTML = `
+            <div class="page" id="page-home"></div>
+            <div class="page" id="page-items"></div>
+            <div class="page" id="page-stats"></div>
+            <div class="page" id="page-reminders"></div>
+            <div class="page" id="page-rooms"></div>
+            <div class="page" id="page-tags"></div>
+            <div class="page" id="page-theme"></div>
+            <div class="page" id="page-import"></div>
+            <div class="page" id="page-settings"></div>
+            <div class="page" id="page-ai"></div>
+            <div class="page" id="page-furniture"></div>
+            <div class="page" id="page-entry"></div>
+            <div class="page" id="page-item-detail"></div>
+          `;
+        }
+
+        function showPage(page) {
+            state.currentPage = page;
+            if (['home', 'reminders', 'ai', 'items'].includes(page)) state.currentNav = page;
+            $$('.page').forEach(p => p.classList.remove('active'));
+            const targetPage = document.getElementById('page-' + page);
+            if (targetPage) targetPage.classList.add('active');
+            switch (page) {
+                case 'home':
+                    renderHome();
+                    break;
+                case 'items':
+                    renderItems();
+                    break;
+                case 'stats':
+                    renderStats();
+                    break;
+                case 'reminders':
+                    renderReminders();
+                    break;
+                case 'rooms':
+                    renderRooms();
+                    break;
+                case 'tags':
+                    renderTags();
+                    break;
+                case 'theme':
+                    renderThemePage();
+                    break;
+                case 'import':
+                    renderImport();
+                    break;
+                case 'settings':
+                    renderSettings();
+                    break;
+                case 'ai':
+                    renderAI();
+                    break;
+            }
+            renderBottomNav();
+            closeMenu();
+        }
+
+        function navigateTo(page) {
+            showPage(page);
+        }
+
+        function toggleMenu() {
+            const overlay = document.getElementById('menuOverlay');
+            const menu = document.getElementById('sideMenu');
+            overlay.classList.toggle('active');
+            menu.classList.toggle('open');
+        }
+
+        function closeMenu() {
+            const overlay = document.getElementById('menuOverlay');
+            const menu = document.getElementById('sideMenu');
+            if (overlay) overlay.classList.remove('active');
+            if (menu) menu.classList.remove('open');
+        }
+
+        function closeMenuAndGoHome() {
+            showPage('home');
+        }
+       // ========== 首页 ==========
+        function renderHome() {
+            const page = $('#page-home');
+            const hours = new Date().getHours();
+            let greeting = '你好呀！';
+            if (hours < 9) greeting = '早安，哈尼 ☀️';
+            else if (hours < 18) greeting = '午后好，哈尼 🍰';
+            else greeting = '晚安，哈尼 🌙';
+
+            const rooms = state.rooms || [];
+            const totalItems = state.items.reduce((s, i) => s + i.quantity, 0);
+            const totalValue = state.items.reduce((s, i) => s + i.price * i.quantity, 0);
+            const avgDaily = state.items.reduce((s, i) => s + parseFloat(i.dailyPrice || 0), 0);
+
+            let matchedRoom = rooms.find(r => r.name === state.currentRoom);
+            if (!matchedRoom) matchedRoom = rooms[0];
+            if (!matchedRoom) {
+                page.innerHTML =
+                    `<div class="empty-state" style="padding-top:60px;"><div class="emoji">🏠</div><div class="text">暂无空间，请先添加房间</div></div>`;
+                return;
+            }
+
+            if (!state.currentRoom && matchedRoom) state.currentRoom = matchedRoom.name;
+
+            const furnitureCards = matchedRoom.furniture.map(f => {
+                const count = state.items.filter(i => i.room === matchedRoom.name && i.furniture === f.name)
+                    .length;
+                return `<div class="furniture-card" onclick="openFurniture('${escapeHtml(matchedRoom.name)}', '${escapeHtml(f.name)}')">
+              <div class="icon">${escapeHtml(f.icon)}</div>
+              <div class="name">${escapeHtml(f.name)}</div>
+              <div class="count">${count} 件物品</div>
+            </div>`;
+            }).join('');
+
+            page.innerHTML = `
+<div class="welcome-header" style="padding: 20px 20px 0;">
+            <h2 style="font-size: 24px; font-weight: 800; color: var(--text);">${greeting}</h2>
+            <p style="font-size: 13px; color: var(--text-secondary);">今天想整理点什么呢？</p>
+        </div>
+            <div class="stats-row">
+              <div class="stat-card"><div class="value">${totalItems}</div><div class="label">总数量</div></div>
+              <div class="stat-card"><div class="value">¥${totalValue.toLocaleString()}</div><div class="label">物品总值</div></div>
+              <div class="stat-card"><div class="value">¥${avgDaily.toFixed(1)}</div><div class="label">日均价</div></div>
+            </div>
+            <div class="search-box" onclick="focusSearch()">
+              <span>🔍</span>
+              <input type="text" id="homeSearch" placeholder="搜索物品名称..." oninput="onHomeSearch(this.value)" onkeydown="if(event.key==='Enter')doHomeSearch()">
+            </div>
+            <div class="section-title">🏠 我的小家</div>
+            <div class="room-tabs">
+              ${rooms.map(r => `<div class="room-tab ${r.name === matchedRoom.name ? 'active' : ''}" onclick="switchRoom('${escapeHtml(r.name)}')">${escapeHtml(r.name)}</div>`).join('')}
+            </div>
+            <div class="furniture-grid">
+              ${furnitureCards || '<div class="empty-state" style="grid-column:1/-1"><div class="emoji">🏠</div><div class="text">该空间暂无收纳，去空间管理添加吧</div></div>'}
+            </div>
+          `;
+        }
+
+        function switchRoom(roomName) {
+            state.currentRoom = roomName;
+            renderHome();
+            saveState();
+        }
+
+        function focusSearch() {
+            const el = document.getElementById('homeSearch');
+            if (el) el.focus();
+        }
+
+        function onHomeSearch(val) {
+            state.searchKeyword = val;
+        }
+
+        function doHomeSearch() {
+            if (state.searchKeyword.trim()) {
+                showPage('items');
+                setTimeout(() => {
+                    const searchInput = document.getElementById('itemSearchInput');
+                    if (searchInput) {
+                        searchInput.value = state.searchKeyword;
+                        filterItems();
+                    }
+                }, 100);
+            }
+        }
+
+        // ========== 物品清单 ==========
+        let subFilter = '';
+
+        function renderItems() {
+            const page = $('#page-items');
+            if (!page.dataset.built) {
+                page.innerHTML = `
+              <div class="items-toolbar">
+                <div class="search-box" style="margin:0;">
+                  <span>🔍</span>
+                  <input type="text" id="itemSearchInput" placeholder="搜索名称/空间/位置/分类/标签/状态..." value="${escapeHtml(state.searchKeyword || '')}" oninput="filterItems()">
+                </div>
+                <div class="filter-bar" id="filterBar"></div>
+              </div>
+              <div class="item-grid" id="itemGrid"></div>
+            `;
+                page.dataset.built = '1';
+            }
+            renderFilterBar();
+            renderItemGrid();
+            const input = document.getElementById('itemSearchInput');
+            if (input && input.value !== state.searchKeyword) input.value = state.searchKeyword || '';
+        }
+
+        function renderFilterBar() {
+            const filters = [
+                { key: 'all', label: '全部' },
+                { key: 'room', label: '空间' },
+                { key: 'furniture', label: '位置' },
+                { key: 'category', label: '分类' },
+                { key: 'tag', label: '标签' },
+                { key: 'status', label: '状态' },
+            ];
+            const bar = $('#filterBar');
+            if (!bar) return;
+            let html = filters.map(f =>
+                `<div class="filter-chip ${state.filterType === f.key ? 'active' : ''}" onclick="setFilter('${f.key}')">${f.label}</div>`
+                ).join('');
+            if (state.filterType !== 'all') {
+                let options = [];
+                switch (state.filterType) {
+                    case 'room':
+                        options = state.rooms.map(r => r.name);
+                        break;
+                    case 'furniture':
+                        options = state.rooms.flatMap(r => r.furniture.map(f => f.name));
+                        break;
+                    case 'category':
+                        options = state.categories;
+                        break;
+                    case 'tag':
+                        options = state.tags;
+                        break;
+                    case 'status':
+                        options = state.statuses;
+                        break;
+                }
+                html += options.map(o =>
+                    `<div class="filter-chip ${subFilter === o ? 'selected' : ''}" onclick="setSubFilter('${escapeHtml(o)}')">${escapeHtml(o)}</div>`
+                    ).join('');
+            }
+            bar.innerHTML = html;
+        }
+
+        function setFilter(type) {
+            state.filterType = type;
+            subFilter = '';
+            renderFilterBar();
+            renderItemGrid();
+        }
+
+        function setSubFilter(val) {
+            subFilter = subFilter === val ? '' : val;
+            renderFilterBar();
+            renderItemGrid();
+        }
+
+        function getFilteredItems() {
+            let items = [...state.items];
+            const kw = (state.searchKeyword || '').toLowerCase();
+            if (kw) {
+                items = items.filter(i =>
+                    (i.name || '').toLowerCase().includes(kw) ||
+                    (i.room || '').toLowerCase().includes(kw) ||
+                    (i.furniture || '').toLowerCase().includes(kw) ||
+                    (i.category || '').toLowerCase().includes(kw) ||
+                    (i.tags || []).some(t => (t || '').toLowerCase().includes(kw)) ||
+                    (i.status || '').toLowerCase().includes(kw)
+                );
+            }
+            if (state.filterType !== 'all' && subFilter) {
+                switch (state.filterType) {
+                    case 'room':
+                        items = items.filter(i => i.room === subFilter);
+                        break;
+                    case 'furniture':
+                        items = items.filter(i => i.furniture === subFilter);
+                        break;
+                    case 'category':
+                        items = items.filter(i => i.category === subFilter);
+                        break;
+                    case 'tag':
+                        items = items.filter(i => (i.tags || []).includes(subFilter));
+                        break;
+                    case 'status':
+                        items = items.filter(i => i.status === subFilter);
+                        break;
+                }
+            }
+            return items;
+        }
+
+        function renderItemGrid() {
+            const grid = $('#itemGrid');
+            if (!grid) return;
+            const items = getFilteredItems();
+            if (items.length === 0) {
+                grid.innerHTML =
+                    `<div class="empty-state" style="grid-column:1/-1"><div class="emoji">📭</div><div class="text">暂无物品，点击 + 添加吧</div></div>`;
+                return;
+            }
+            const s = state.settings.cardFields;
+            grid.innerHTML = items.map(item => {
+                const days = daysUntil(item.expireDate);
+                let badge = '';
+                if (days !== null && days <= 30) {
+                    const cls = days < 0 ? 'urgent' : days <= 7 ? 'urgent' : 'soon';
+                    badge =
+                        `<div class="expire-badge ${cls}">${days < 0 ? '已过期' : days + '天后到期'}</div>`;
+                }
+                let photoHTML = '';
+                if (s.photo) {
+                    let coverContent = '';
+                    if (item.photos && item.photos[0]) {
+                        coverContent =
+                            `<img src="${escapeHtml(item.photos[0])}" style="width:100%;height:100%;object-fit:cover;" alt="">`;
+                    } else {
+                        coverContent = escapeHtml(item.category ? item.category.split(' ')[0] : '📦');
+                    }
+                    photoHTML = `<div class="photo">${coverContent}</div>`;
+                }
+                const displayName = getDisplayName(item.name);
+                const metaParts = [];
+                if (s.room && item.room) metaParts.push(`<span>📍${escapeHtml(item.room)}</span>`);
+                if (s.furniture && item.furniture) metaParts.push(`<span>🪑 ${escapeHtml(item.furniture)}</span>`);
+                if (s.dailyPrice && item.dailyPrice) metaParts.push(
+                    `<span>💰 ¥${escapeHtml(item.dailyPrice)}/天</span>`);
+                if (s.quantity) metaParts.push(`<span>📦 ×${escapeHtml(item.quantity)}</span>`);
+                return `
+              <div class="item-card" onclick="openItemDetail(${item.id})" oncontextmenu="editItem(${item.id});return false;">
+                ${badge}
+                ${photoHTML}
+                <div class="info">
+                  <div class="name">${escapeHtml(displayName)}</div>
+                  <div class="meta">${metaParts.join('') || '<span>-</span>'}</div>
+                </div>
+              </div>`;
+            }).join('');
+        }
+
+        function filterItems() {
+            const input = document.getElementById('itemSearchInput');
+            state.searchKeyword = input ? input.value : '';
+            renderItemGrid();
+        }
+
+        // ========== 资产统计 ==========
+        function renderStats() {
+            const page = $('#page-stats');
+            const totalValue = state.items.reduce((s, i) => s + i.price * i.quantity, 0);
+            const totalItems = state.items.reduce((s, i) => s + i.quantity, 0);
+            const avgPrice = totalItems > 0 ? (totalValue / totalItems).toFixed(0) : 0;
+            const dailyTotal = state.items.reduce((s, i) => s + parseFloat(i.dailyPrice || 0), 0).toFixed(2);
+            const catStats = {};
+            state.categories.forEach(c => catStats[c] = 0);
+            state.items.forEach(i => { catStats[i.category] = (catStats[i.category] || 0) + i.price * i
+                    .quantity; });
+            const maxCatVal = Math.max(...Object.values(catStats), 1);
+            const roomStats = {};
+            state.rooms.forEach(r => roomStats[r.name] = 0);
+            state.items.forEach(i => { roomStats[i.room] = (roomStats[i.room] || 0) + i.price * i.quantity; });
+            const maxRoomVal = Math.max(...Object.values(roomStats), 1);
+
+            const catHtml = Object.entries(catStats).filter(([k, v]) => v > 0).map(([cat, val]) => `
+            <div class="chart-bar-row">
+              <div class="chart-bar-label">${escapeHtml(cat)}</div>
+              <div class="chart-bar-track">
+                <div class="chart-bar-fill" style="width:${(val/maxCatVal*100)}%"><span>¥${val.toLocaleString()}</span></div>
+              </div>
+            </div>`).join('') || '<div class="empty-state"><div class="emoji">📊</div><div class="text">暂无数据</div></div>';
+
+            const roomHtml = Object.entries(roomStats).filter(([k, v]) => v > 0).map(([room, val]) => `
+            <div class="chart-bar-row">
+              <div class="chart-bar-label">${escapeHtml(room)}</div>
+              <div class="chart-bar-track">
+                <div class="chart-bar-fill" style="width:${(val/maxRoomVal*100)}%"><span>¥${val.toLocaleString()}</span></div>
+              </div>
+            </div>`).join('') || '<div class="empty-state"><div class="emoji">🏠</div><div class="text">暂无数据</div></div>';
+
+            page.innerHTML = `
+            <div style="padding:16px;">
+              <div class="big-stat">
+                <div class="val">¥${totalValue.toLocaleString()}</div>
+                <div class="lbl">总资产价值</div>
+              </div>
+              <div class="stats-grid" style="margin-bottom:16px;">
+                <div class="stats-mini-card"><div class="v">${totalItems}</div><div class="l">物品总数</div></div>
+                <div class="stats-mini-card"><div class="v">¥${avgPrice}</div><div class="l">平均单价</div></div>
+                <div class="stats-mini-card"><div class="v">¥${dailyTotal}</div><div class="l">日均成本</div></div>
+                <div class="stats-mini-card"><div class="v">${state.rooms.length}</div><div class="l">空间数</div></div>
+              </div>
+              <div class="stats-chart">
+                <h4>📊 分类资产分布</h4>
+                ${catHtml}
+              </div>
+              <div class="stats-chart">
+                <h4>🏠 空间资产分布</h4>
+                ${roomHtml}
+              </div>
+            </div>
+          `;
+        }
+
+        // ========== 到期提醒 ==========
+        function renderReminders() {
+            const page = $('#page-reminders');
+            const expired = state.reminders.filter(r => r.status === 'expired');
+            const urgent = state.reminders.filter(r => r.status === 'urgent');
+            const soon = state.reminders.filter(r => r.status === 'soon');
+
+            function reminderHTML(list, statusText, statusClass) {
+                if (list.length === 0) return '';
+                return `<div class="reminder-section">
+              <div class="sec-header">${statusText} (${list.length})</div>
+              <div class="reminder-list">
+                ${list.map(r => `<div class="reminder-item ${r.read ? 'read' : ''}" onclick="markReminderRead(${r.itemId})">
+                  <div class="rphoto">${r.photoUrl ? `<img src="${escapeHtml(r.photoUrl)}" alt="">` : escapeHtml(r.photo || '📦')}</div>
+                  <div class="rinfo">
+                    <div class="rname">${escapeHtml(r.name)}</div>
+                    <div class="rtime">${escapeHtml(r.room)} · ${escapeHtml(r.furniture)} ${r.read ? '✓' : ''}</div>
+                  </div>
+                  <div class="rstatus ${statusClass}">${r.days < 0 ? '已过期' : (r.days + '天后')}</div>
+                  <div class="ractions" onclick="event.stopPropagation()">
+                    <button class="btn-read" title="标记为已读" onclick="markReminderRead(${r.itemId})">✅</button>
+                    <button class="btn-del" title="删除" onclick="deleteReminder(${r.itemId})">🗑️</button>
+                  </div>
+                </div>`).join('')}
+              </div>
+            </div>`;
+            }
+
+            page.innerHTML = `
+            <div style="padding-top:8px;">
+              <div class="reminder-actions">
+                <button class="btn btn-read-all" onclick="readAllReminders()">✅ 全部已读</button>
+                <button class="btn btn-del-all" onclick="deleteAllReminders()">🗑️ 全部删除</button>
+              </div>
+              ${reminderHTML(expired, '⛔ 已过期', 'expired')}
+              ${reminderHTML(urgent, '🔴 即将过期(7天内)', 'urgent')}
+              ${reminderHTML(soon, '🟡 即将过期(15天内)', 'soon')}
+              ${state.reminders.length === 0 ? '<div class="empty-state"><div class="emoji">🎉</div><div class="text">太好了，没有即将过期的物品！</div></div>' : ''}
+            </div>
+          `;
+        }
+
+        function markReminderRead(itemId) {
+            const r = state.reminders.find(x => x.itemId === itemId);
+            if (r) r.read = true;
+            updateBadge();
+            renderReminders();
+            renderBottomNav();
+            saveState();
+        }
+
+        function deleteReminder(itemId) {
+            state.reminders = state.reminders.filter(r => r.itemId !== itemId);
+            if (!state.ignoredReminderIds.includes(itemId)) state.ignoredReminderIds.push(itemId);
+            updateBadge();
+            renderReminders();
+            renderBottomNav();
+            saveState();
+        }
+
+        function readAllReminders() {
+            state.reminders.forEach(r => r.read = true);
+            updateBadge();
+            renderReminders();
+            renderBottomNav();
+            showToast('已全部标记为已读');
+            saveState();
+        }
+
+        function deleteAllReminders() {
+            state.reminders.forEach(r => {
+                if (!state.ignoredReminderIds.includes(r.itemId)) state.ignoredReminderIds.push(r.itemId);
+            });
+            state.reminders = [];
+            updateBadge();
+            renderReminders();
+            renderBottomNav();
+            showToast('已清空所有提醒');
+            saveState();
+        }
+
+        function openReminders() {
+            showPage('reminders');
+        }
+
+        // ========== 空间管理 ==========
+        function renderRooms() {
+            const page = $('#page-rooms');
+            page.innerHTML = `
+            <div style="padding:16px;">
+              ${state.rooms.map(room => `
+                <div style="margin-bottom:16px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                    <div style="font-size:16px;font-weight:700;color:var(--text);">${escapeHtml(room.name)}</div>
+                    <div style="display:flex;gap:6px;">
+                      <button onclick="editRoom(${room.id})" style="padding:4px 10px;border-radius:8px;background:var(--primary-light);border:none;color:var(--primary-dark);font-size:12px;cursor:pointer;">编辑</button>
+                      <button onclick="deleteRoom(${room.id})" style="padding:4px 10px;border-radius:8px;background:#FFE0E3;border:none;color:#FF4757;font-size:12px;cursor:pointer;">删除</button>
+                    </div>
+                  </div>
+                  <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                    ${room.furniture.map(f => `<div style="padding:6px 14px;background:var(--card-bg);border-radius:10px;border:1px solid var(--border);font-size:13px;display:flex;align-items:center;gap:6px;">
+                      ${escapeHtml(f.name)}
+                      <span onclick="deleteFurniture(${room.id},${f.id})" style="cursor:pointer;color:#FF4757;font-size:14px;">✕</span>
+                    </div>`).join('')}
+                    <button onclick="addFurniture(${room.id})" style="padding:6px 14px;border-radius:10px;border:1.5px dashed var(--primary);background:transparent;color:var(--primary);font-size:13px;cursor:pointer;">+ 添加位置</button>
+                  </div>
+                </div>
+              `).join('')}
+              <button onclick="addRoom()" style="width:100%;padding:14px;border-radius:12px;border:2px dashed var(--primary);background:transparent;color:var(--primary);font-size:15px;font-weight:600;cursor:pointer;">+ 添加空间</button>
+            </div>
+          `;
+        }
+
+        function addRoom() {
+            const name = prompt('请输入空间名称（可加emoji前缀，如：🏋️ 健身房）:');
+            if (name && name.trim()) {
+                state.rooms.push({ id: Date.now(), name: name.trim(), furniture: [] });
+                renderRooms();
+                renderHome();
+                showToast('空间已添加');
+                saveState();
+            }
+        }
+
+        function editRoom(id) {
+            const room = state.rooms.find(r => r.id === id);
+            if (!room) return;
+            const name = prompt('编辑空间名称:', room.name);
+            if (name !== null && name.trim()) {
+                room.name = name.trim();
+                renderRooms();
+                renderHome();
+                saveState();
+            }
+        }
+
+        function deleteRoom(id) {
+            if (confirm('确定删除该空间及其所有定位？')) {
+                state.rooms = state.rooms.filter(r => r.id !== id);
+                renderRooms();
+                renderHome();
+                showToast('空间已删除');
+                saveState();
+            }
+        }
+
+        function addFurniture(roomId) {
+            const name = prompt('请输入具体位置（可加emoji前缀，如：🎮 游戏桌）:');
+            if (name && name.trim()) {
+                const room = state.rooms.find(r => r.id === roomId);
+                if (!room) return;
+                room.furniture.push({ id: Date.now(), name: name.trim(), icon: name.trim().charAt(0) });
+                renderRooms();
+                renderHome();
+                showToast('位置已添加');
+                saveState();
+            }
+        }
+
+        function deleteFurniture(roomId, furnitureId) {
+            const room = state.rooms.find(r => r.id === roomId);
+            if (!room) return;
+            room.furniture = room.furniture.filter(f => f.id !== furnitureId);
+            renderRooms();
+            renderHome();
+            showToast('定位已删除');
+            saveState();
+        }
+
+        // ========== 标签管理 ==========
+        function renderTags() {
+            const page = $('#page-tags');
+            page.innerHTML = `
+            <div style="padding:16px;">
+              <h3 style="font-size:15px;margin-bottom:10px;color:var(--text);">📂 分类</h3>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
+                ${state.categories.map((c, i) => `<div style="padding:6px 14px;background:var(--card-bg);border-radius:10px;border:1px solid var(--border);font-size:13px;display:flex;align-items:center;gap:6px;">
+                  ${escapeHtml(c)}<span onclick="editCategory(${i})" style="cursor:pointer;color:var(--primary);font-size:12px;">✎</span>
+                  <span onclick="deleteCategory(${i})" style="cursor:pointer;color:#FF4757;font-size:14px;">✕</span>
+                </div>`).join('')}
+                <button onclick="addCategory()" style="padding:6px 14px;border-radius:10px;border:1.5px dashed var(--primary);background:transparent;color:var(--primary);font-size:13px;cursor:pointer;">+ 添加</button>
+              </div>
+              <h3 style="font-size:15px;margin-bottom:10px;color:var(--text);">🏷️ 标签</h3>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
+                ${state.tags.map((t, i) => `<div style="padding:6px 14px;background:var(--primary-light);border-radius:16px;font-size:13px;display:flex;align-items:center;gap:6px;color:var(--primary-dark);">
+                  ${escapeHtml(t)}<span onclick="deleteTag(${i})" style="cursor:pointer;color:#FF4757;font-size:14px;">✕</span>
+                </div>`).join('')}
+                <button onclick="addTag()" style="padding:6px 14px;border-radius:16px;border:1.5px dashed var(--primary);background:transparent;color:var(--primary);font-size:13px;cursor:pointer;">+ 添加</button>
+              </div>
+              <h3 style="font-size:15px;margin-bottom:10px;color:var(--text);">📌 状态</h3>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                ${state.statuses.map((s, i) => `<div style="padding:6px 14px;background:var(--card-bg);border-radius:10px;border:1px solid var(--border);font-size:13px;display:flex;align-items:center;gap:6px;">
+                  ${escapeHtml(s)}<span onclick="deleteStatus(${i})" style="cursor:pointer;color:#FF4757;font-size:14px;">✕</span>
+                </div>`).join('')}
+                <button onclick="addStatus()" style="padding:6px 14px;border-radius:10px;border:1.5px dashed var(--primary);background:transparent;color:var(--primary);font-size:13px;cursor:pointer;">+ 添加</button>
+              </div>
+            </div>
+          `;
+        }
+
+        function addCategory() { const n = prompt('输入分类名称（emoji+文本）:'); if (n && n.trim()) { state.categories
+                    .push(n.trim());
+                renderTags();
+                saveState(); } }
+
+        function deleteCategory(i) { state.categories.splice(i, 1);
+            renderTags();
+            saveState(); }
+
+        function editCategory(i) { const n = prompt('编辑分类:', state.categories[i]); if (n !== null && n.trim()) { state
+                    .categories[i] = n.trim();
+                renderTags();
+                saveState(); } }
+
+        function addTag() { const n = prompt('输入标签名称:'); if (n && n.trim()) { state.tags.push(n.trim());
+                renderTags();
+                saveState(); } }
+
+        function deleteTag(i) { state.tags.splice(i, 1);
+            renderTags();
+            saveState(); }
+
+        function addStatus() { const n = prompt('输入状态（emoji+文本）:'); if (n && n.trim()) { state.statuses.push(n.trim());
+                renderTags();
+                saveState(); } }
+
+        function deleteStatus(i) { state.statuses.splice(i, 1);
+            renderTags();
+            saveState(); }
+
+        // ========== 主题焕新 ==========
+        function renderThemePage() {
+            const page = $('#page-theme');
+            page.innerHTML = `
+            <div style="padding:16px;">
+              <div style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;">选择你喜欢的主题风格，让你的收纳之旅更愉悦 🎨</div>
+              <div class="theme-grid">
+                ${themes.map(t => `
+                  <div class="theme-card ${t.key === state.currentTheme ? 'selected' : ''}" onclick="selectTheme('${t.key}')">
+                    <div class="preview" style="background:${t.gradient};"></div>
+                    <div class="tname">${t.name}</div>
+                  </div>`).join('')}
+              </div>
+              <div style="margin-top:16px;padding:16px;background:var(--card-bg);border-radius:14px;border:1px solid var(--border);">
+                <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px;">💡 小提示</div>
+                <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;">
+                  • 点击首页顶部的 Logo 也可随机切换主题<br>
+                  • 主题偏好会自动保存在本地<br>
+                  • 暗夜幽黑适合夜间使用，保护视力
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        function selectTheme(key) {
+            applyTheme(key);
+            showToast('主题已切换');
+            renderThemePage();
+            saveState();
+        }
+
+        // ========== 导入导出 ==========
+        function renderImport() {
+            const page = $('#page-import');
+            page.innerHTML = `
+            <div style="padding:16px;">
+              <div style="background:var(--card-bg);border-radius:14px;padding:16px;margin-bottom:16px;border:1px solid var(--border);">
+                <h4 style="font-size:14px;margin-bottom:10px;color:var(--text);">📋 数据概览</h4>
+                <div style="font-size:13px;color:var(--text-secondary);line-height:2;">
+                  <div>📦 物品总数: <b style="color:var(--text);">${state.items.length}</b> 条</div>
+                  <div>🏠 空间数: <b style="color:var(--text);">${state.rooms.length}</b> 个</div>
+                  <div>💰 资产总值: <b style="color:var(--text);">¥${state.items.reduce((s,i)=>s+i.price*i.quantity,0).toLocaleString()}</b></div>
+                </div>
+              </div>
+              <div class="import-export-btns">
+                <button class="ie-btn export" onclick="exportExcel()">📤 导出为 Excel</button>
+                <button class="ie-btn import" onclick="importExcel()">📥 导入 Excel</button>
+                <button class="ie-btn template" onclick="downloadTemplate()">📄 下载 Excel 模板</button>
+              </div>
+              <div class="ie-tutorial">
+                <h4>📖 导入导出教程</h4>
+                <p><b>导出数据：</b><br>点击"导出为Excel"按钮，系统将自动下载包含所有物品信息的 .csv 文件。</p>
+                <p style="margin-top:10px;"><b>📂 文件保存位置：</b><br>✅ 若手机浏览器支持（Chrome/Edge/部分安卓浏览器），会弹出系统保存框。<br>✅ 若不支持，文件将自动下载到默认下载目录。</p>
+                <p style="margin-top:10px;"><b>字段说明：</b><br>名称、单价、数量、购买日期、过期日期、启封日期、启用效期(天)、空间、位置、分类、状态、标签(逗号分隔)、备注</p>
+              </div>
+            </div>
+          `;
+        }
+
+        async function saveFile(fileName, csvContent) {
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            if (window.showSaveFilePicker) {
+                try {
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: fileName,
+                        types: [{ description: 'CSV 文件', accept: { 'text/csv': ['.csv'] } }]
+                    });
+                    const writable = await handle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                    showToast('✅ 已保存到：' + handle.name);
+                } catch (err) {
+                    if (err.name === 'AbortError') return;
+                    fallbackDownload(fileName, blob);
+                }
+            } else {
+                fallbackDownload(fileName, blob);
+            }
+        }
+
+        function fallbackDownload(fileName, blob) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            showToast('💾 已保存到下载目录');
+        }
+
+        function downloadTemplate() {
+            try {
+                const headers = ['名称', '单价', '数量', '购买日期', '过期日期', '启封日期', '启用效期(天)', '空间', '位置', '分类', '状态',
+                    '标签(逗号分隔)', '备注'
+                ];
+                const sample = ['示例：精华液', '399', '1', '2026/5/10', '2026/9/1', '2026/5/15', '365', '🛏️ 卧室', '🧴 梳妆台', '💄 美妆护肤',
+                    '✅ 在用', '常用,贵重', '这是备注'
+                ];
+                const csv = '\uFEFF' + [headers.join(','), sample.join(',')].join('\n');
+                saveFile('暖居收纳_模板.csv', csv);
+            } catch (err) {
+                showToast('下载模板失败，请重试');
+            }
+        }
+
+        function exportExcel() {
+            try {
+                const headers = ['名称', '单价', '数量', '总价', '购买日期', '过期日期', '启封日期', '启用效期(天)', '空间', '位置', '分类', '状态',
+                    '标签', '备注', '日均价'
+                ];
+                const rows = state.items.map(i => [
+                    i.name, i.price, i.quantity, i.price * i.quantity, i.purchaseDate, i.expireDate,
+                    i.openDate, i.openUseDays, i.room, i.furniture, i.category, i.status,
+                    (i.tags || []).join(','), i.notes, i.dailyPrice
+                ]);
+                const csv = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+                const fileName = `暖居收纳_导出_${new Date().toISOString().slice(0,10)}.csv`;
+                saveFile(fileName, csv);
+            } catch (err) {
+                showToast('导出失败，请重试');
+            }
+        }
+
+        function importExcel() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.csv,.xlsx,.xls';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    try {
+                        const text = ev.target.result;
+                        const lines = text.split('\n').slice(1);
+                        let imported = 0;
+                        lines.forEach(line => {
+                            if (!line.trim()) return;
+                            const cols = line.split(',');
+                            if (cols[0] && cols[0] !== '示例：精华液') {
+                                const newItem = {
+                                    id: Date.now() + imported,
+                                    name: cols[0] || '未命名',
+                                    price: parseFloat(cols[1]) || 0,
+                                    quantity: parseInt(cols[2]) || 1,
+                                    purchaseDate: cols[3] || '',
+                                    expireDate: cols[4] || '',
+                                    openDate: cols[5] || '',
+                                    openUseDays: cols[6] || '',
+                                    room: cols[7] || (state.rooms[0]?.name || ''),
+                                    furniture: cols[8] || '',
+                                    category: cols[9] || (state.categories[0] || ''),
+                                    status: cols[10] || '✅ 在用',
+                                    tags: cols[11] ? cols[11].split(';').map(t => t.trim()).filter(Boolean) : [],
+                                    notes: cols[12] || '',
+                                    photos: [],
+                                    dailyPrice: 0,
+                                };
+                                newItem.dailyPrice = calcDailyPrice(newItem);
+                                state.items.push(newItem);
+                                imported++;
+                            }
+                        });
+                        generateReminders();
+                        renderImport();
+                        showToast(`成功导入 ${imported} 条数据`);
+                        saveState();
+                    } catch (err) {
+                        showToast('导入失败：文件格式错误');
+                        console.error(err);
+                    }
+                };
+                reader.readAsText(file, 'utf-8');
+            };
+            input.click();
+        }
+
+        // ========== 设置 ==========
+        function renderSettings() {
+            const page = $('#page-settings');
+            const displayFields = [
+                { key: 'photo', label: '图片', card: true, form: true },
+                { key: 'name', label: '名称', card: true, form: true },
+                { key: 'price', label: '单价', card: true, form: true },
+                { key: 'quantity', label: '数量', card: true, form: true },
+                { key: 'purchaseDate', label: '购买日', card: true, form: true },
+                { key: 'expireDate', label: '到期日', card: true, form: true },
+                { key: 'openDate', label: '启封日', card: true, form: true },
+                { key: 'openUseDays', label: '开封效期', card: true, form: true },
+                { key: 'dailyPrice', label: '日均价', card: true, form: false },
+                { key: 'room', label: '空间', card: true, form: true },
+                { key: 'furniture', label: '位置', card: true, form: true },
+                { key: 'category', label: '分类', card: true, form: true },
+                { key: 'status', label: '状态', card: true, form: true },
+                { key: 'tags', label: '标签', card: true, form: true },
+                { key: 'notes', label: '备注', card: true, form: true },
+            ];
+
+            const allCardChecked = displayFields.filter(f => f.card).every(f => state.settings.cardFields[f.key]);
+            const allFormChecked = displayFields.filter(f => f.form).every(f => state.settings.formFields[f.key]);
+
+            const displayGroupHtml = `
+            <div class="settings-group">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:8px;">
+                <h4 style="margin:0;">👀 显示设置</h4>
+              </div>
+              <div style="font-size:11px;color:var(--text-secondary);line-height:1.6;padding-bottom:8px;">
+                卡片：物品列表/详情页显示；表单：添加/编辑页显示。
+              </div>
+              <div style="background:var(--card-bg);border-radius:10px;border:1px solid var(--border);padding:8px 14px;">
+                <div style="display:grid;grid-template-columns: 1fr 80px 80px; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); font-weight:600; color:var(--text-secondary); font-size:12px;">
+                  <div>项目</div>
+                  <div style="text-align:center;">
+                    <span>卡片全选</span>
+                    <input type="checkbox" ${allCardChecked ? 'checked' : ''} onchange="toggleAllDisplayFields('card', this.checked)" style="display:block;margin:6px auto 0;width:18px;height:18px;accent-color:var(--primary);cursor:pointer;">
+                  </div>
+                  <div style="text-align:center;">
+                    <span>表单全选</span>
+                    <input type="checkbox" ${allFormChecked ? 'checked' : ''} onchange="toggleAllDisplayFields('form', this.checked)" style="display:block;margin:6px auto 0;width:18px;height:18px;accent-color:var(--primary);cursor:pointer;">
+                  </div>
+                </div>
+                ${displayFields.map(f => {
+                  const cardChecked = state.settings.cardFields[f.key] ? 'checked' : '';
+                  const formChecked = state.settings.formFields[f.key] ? 'checked' : '';
+                  return `
+                  <div style="display:grid;grid-template-columns: 1fr 80px 80px; align-items:center; padding:12px 0; border-bottom:1px solid var(--border);">
+                    <span style="font-size:14px;color:var(--text);">${f.label}</span>
+                    <div style="text-align:center;">
+                      <input type="checkbox" ${cardChecked} onchange="toggleSetting('cardFields','${f.key}',this.checked)" style="width:18px;height:18px;accent-color:var(--primary);cursor:pointer;">
+                    </div>
+                    <div style="text-align:center;">
+                      <input type="checkbox" ${formChecked} onchange="toggleSetting('formFields','${f.key}',this.checked)" style="width:18px;height:18px;accent-color:var(--primary);cursor:pointer;">
+                    </div>
+                  </div>`;
+                }).join('')}
+              </div>
+            </div>
+          `;
+
+            const aiModelOptions = `
+            <optgroup label="按量付费 (纯文本)">
+              <option value="deepseek-chat" ${state.aiModel==='deepseek-chat'?'selected':''}>DeepSeek Chat (纯文本)</option>
+              <option value="deepseek-reasoner" ${state.aiModel==='deepseek-reasoner'?'selected':''}>DeepSeek Reasoner (推理)</option>
+              <option value="gpt-4o" ${state.aiModel==='gpt-4o'?'selected':''}>GPT-4o (支持图片识别)</option>
+              <option value="gpt-4o-mini" ${state.aiModel==='gpt-4o-mini'?'selected':''}>GPT-4o Mini (支持图片识别)</option>
+            </optgroup>
+            <optgroup label="官方视觉模型 (按量付费)">
+              <option value="deepseek-v4-flash-vision-exp" ${state.aiModel==='deepseek-v4-flash-vision-exp'?'selected':''}>DeepSeek-V4-Flash-Vision (官方新上线)</option>
+            </optgroup>
+            <optgroup label="第三方免费视觉模型">
+              <option value="glm-4.6v-flash" ${state.aiModel==='glm-4.6v-flash'?'selected':''}>智谱 GLM-4.6V-Flash (免费)</option>
+              <option value="glm-4.1v-thinking-flash" ${state.aiModel==='glm-4.1v-thinking-flash'?'selected':''}>智谱 GLM-4.1V-Thinking-Flash (免费推理)</option>
+              <option value="qwen-vl-plus" ${state.aiModel==='qwen-vl-plus'?'selected':''}>阿里云 Qwen-VL-Plus (有免费额度)</option>
+              <option value="deepseek-ocr" ${state.aiModel==='deepseek-ocr'?'selected':''}>硅基流动 DeepSeek-OCR (免费)</option>
+              <option value="paddleocr-vl-1.5" ${state.aiModel==='paddleocr-vl-1.5'?'selected':''}>硅基流动 PaddleOCR-VL-1.5 (免费)</option>
+            </optgroup>
+            <optgroup label="第三方付费视觉模型">
+              <option value="doubao-seed-2-0-mini-260428" ${state.aiModel==='doubao-seed-2-0-mini-260428'?'selected':''}>火山引擎 豆包视觉模型 (需开通，有赠送token)</option>
+            </optgroup>
+          `;
+
+            page.innerHTML = `
+            ${displayGroupHtml}
+            <div style="padding:0 16px; margin-bottom:16px;">
+              <div style="padding:14px;background:var(--card-bg);border-radius:12px;border:1px solid var(--border);">
+                <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;">🤖 AI 模型选择</div>
+                <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;">选择用于对话的模型：</div>
+                <select id="aiModelSelect" onchange="changeAIModel(this.value)" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);">
+                  ${aiModelOptions}
+                </select>
+                <div style="font-size:11px;color:var(--primary-dark);margin-top:8px;line-height:1.6;">
+                  ⚠️ 注意：若选择"第三方免费视觉模型"，请前往对应平台注册并获取 API Key。<br>
+                  💡 免费用量政策轮换频繁，具体免费额度请以各平台控制台为准。
+                </div>
+              </div>
+            </div>
+            <div style="padding:0 16px;">
+              <div style="padding:14px;background:var(--card-bg);border-radius:12px;border:1px solid var(--border);">
+                <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;">🔔 提醒设置</div>
+                <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;">
+                  即将过期提醒: 到期前 15 天、7 天各提醒一次<br>
+                  提醒方式: 底部导航角标 + 到期提醒页面
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        function toggleSetting(group, field, val) {
+            if (!state.settings[group]) state.settings[group] = {};
+            state.settings[group][field] = val;
+            if (group === 'cardFields') {
+                renderItems();
+            }
+            if (group === 'formFields') {
+                const entryPage = document.getElementById('page-entry');
+                if (entryPage && entryPage.classList.contains('active')) renderEntryPage();
+            }
+            saveState();
+        }
+
+        function toggleAllDisplayFields(group, checked) {
+            const groupKey = group === 'card' ? 'cardFields' : 'formFields';
+            const fields = Object.keys(state.settings[groupKey]);
+            fields.forEach(key => {
+                state.settings[groupKey][key] = checked;
+            });
+            renderSettings();
+            saveState();
+        }
+
+        function changeAIModel(model) {
+            state.aiModel = model;
+            localStorage.setItem('deepseek_model', model);
+            showToast('已切换模型：' + model);
+            renderAI();
+            saveState();
+        }
+
+        // ========== 暖居小兜 ==========
+        let chatHistory = [];
+        let pendingImages = [];
+        const QUICK_PROMPTS = ['📊 分析我的收纳数据', '🗂️ 收纳建议', '♻️ 找出闲置物品'];
+
+function renderAI() {
+            const page = $('#page-ai');
+            page.classList.add('no-page-pad');
+            const modelLabel = state.aiModel === 'deepseek-chat' ? 'Chat(文本)' :
+                state.aiModel === 'deepseek-reasoner' ? 'Reasoner(推理)' :
+                state.aiModel === 'gpt-4o' ? 'GPT-4o(视觉)' :
+                state.aiModel === 'gpt-4o-mini' ? 'Mini(视觉)' :
+                state.aiModel;
+            
+            page.innerHTML = `
+            <div class="chat-container">
+              <div class="chat-api-settings">
+                <div class="chat-avatar" style="width:32px; height:32px; font-size:18px;">🐻</div>
+                <div class="model-info">
+                  <div class="model-name">暖居小兜 · ${escapeHtml(modelLabel)}</div>
+                  ${state.apiKey ? 
+                    '<div class="status-tag ready"><span style="margin-right:3px">●</span>已连接</div>' : 
+                    '<div class="status-tag wait"><span style="margin-right:3px">●</span>未配置密钥</div>'}
+                </div>
+                <div class="action-btns">
+                  <button class="set-btn" onclick="openApiSettings()">${state.apiKey ? '设置' : '配置'}</button>
+                  <button class="set-btn clear" onclick="clearChat()">清空</button>
+                </div>
+              </div>
+              <div class="chat-messages" id="chatMessages"></div>
+              <div class="chat-attach-preview" id="attachPreview"></div>
+              <div class="chat-quickbar" id="chatQuickbar"></div>
+              <div class="chat-input-bar">
+                <button class="tool-btn" title="添加图片" onclick="openChatImageSource()">📎</button>
+                <input type="file" id="chatFileInput" accept="image/*" capture="environment" multiple style="display:none;" onchange="onChatFiles(event)">
+                <input type="file" id="chatAlbumInput" accept="image/*" multiple style="display:none;" onchange="onChatFiles(event)">
+                <div class="input-wrap">
+                  <textarea id="chatInput" rows="1" placeholder="想问什么？直接输入或发照片..." oninput="autoResizeChatInput();updateChatSendBtn();" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+                </div>
+                <button class="chat-send-btn" id="chatSendBtn" onclick="sendChat()">➤</button>
+              </div>
+            </div>
+          `;
+            renderChatQuickbar();
+            renderAttachPreview();
+            renderChatMessages();
+        }
+
+        function renderChatQuickbar() {
+            const bar = $('#chatQuickbar');
+            if (!bar) return;
+            bar.style.display = 'flex';
+            bar.innerHTML = QUICK_PROMPTS.map(q =>
+                `<span class="quick-chip" onclick="useQuickPrompt('${escapeHtml(q)}')">${escapeHtml(q)}</span>`).join('');
+        }
+
+        function useQuickPrompt(text) {
+            const input = $('#chatInput');
+            if (!input) return;
+            input.value = text;
+            autoResizeChatInput();
+            updateChatSendBtn();
+            input.focus();
+        }
+
+        function autoResizeChatInput() {
+            const ta = $('#chatInput');
+            if (!ta) return;
+            ta.style.height = 'auto';
+            ta.style.height = Math.min(ta.scrollHeight, 90) + 'px';
+        }
+
+        function updateChatSendBtn() {
+            const ta = $('#chatInput');
+            const btn = $('#chatSendBtn');
+            if (!ta || !btn) return;
+            btn.disabled = !ta.value.trim() && pendingImages.length === 0;
+        }
+
+        function openChatImageSource() {
+            const sheet = $('#chatSourceSheet');
+            if (sheet) {
+                sheet.classList.toggle('show');
+                return;
+            }
+            const html = `
+            <div class="chat-source-sheet show" id="chatSourceSheet">
+              <div class="sheet-title">🐻 添加图片，让 聪明的小兜 帮你识别记录</div>
+              <div class="sheet-item" onclick="chatTakePhoto();hideChatSheet()"><span class="si-icon">📷</span><span>拍照（调用摄像头）</span></div>
+              <div class="sheet-item" onclick="chatUploadImages();hideChatSheet()"><span class="si-icon">🖼️</span><span>从相册选择（可多选）</span></div>
+              <div class="sheet-cancel" onclick="hideChatSheet()">取消</div>
+            </div>`;
+            $('#page-ai').insertAdjacentHTML('beforeend', html);
+        }
+
+        function hideChatSheet() {
+            const s = $('#chatSourceSheet');
+            if (s) s.classList.remove('show');
+        }
+
+        function chatUploadImages() {
+            const input = $('#chatAlbumInput') || $('#chatFileInput');
+            if (input) {
+                input.removeAttribute('capture');
+                input.click();
+            }
+        }
+
+        function chatTakePhoto() {
+            const input = $('#chatFileInput');
+            if (input) {
+                input.setAttribute('capture', 'environment');
+                input.click();
+            }
+        }
+
+        function onChatFiles(e) {
+            const files = e.target.files;
+            if (!files || !files.length) return;
+            Array.from(files).forEach(f => {
+                if (!f.type.startsWith('image/')) return;
+                if (pendingImages.length >= 3) {
+                    showToast('最多附带3张图片');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => {
+                    pendingImages.push(reader.result);
+                    renderAttachPreview();
+                    updateChatSendBtn();
+                };
+                reader.readAsDataURL(f);
+            });
+            e.target.value = '';
+        }
+
+        function removePendingImage(idx) {
+            pendingImages.splice(idx, 1);
+            renderAttachPreview();
+            updateChatSendBtn();
+        }
+
+        function renderAttachPreview() {
+            const box = $('#attachPreview');
+            if (!box) return;
+            box.innerHTML = pendingImages.map((src, i) =>
+                `<div class="thumb"><img src="${escapeHtml(src)}" alt=""><div class="rm" onclick="removePendingImage(${i})">✕</div></div>`
+                ).join('');
+        }
+
+        function renderChatMessages() {
+            const container = $('#chatMessages');
+            if (!container) return;
+            if (chatHistory.length === 0) {
+                chatHistory.push({
+                    role: 'bot',
+                    content: '🐻 日安！我是熊熊小兜～\n\n我可以帮你：\n1️⃣ 分析收纳数据并给出建议\n2️⃣ 拍照/相册选图识别添加物品记录（需切换GPT-4o等视觉模型）\n3️⃣ 闲聊解闷\n\n点下方快捷语、或直接发图试试吧！'
+                });
+            }
+            container.innerHTML = chatHistory.map(msg => {
+                if (msg.itemCard) {
+                    const ic = msg.itemCard;
+                    const cardJson = JSON.stringify(ic).replace(/"/g, '&quot;');
+                    return `<div class="chat-msg ${msg.role}"><div class="chat-avatar">${msg.role === 'bot' ? '🐻' : '🍯'}</div><div class="chat-bubble"><div style="background:var(--bg);border-radius:10px;padding:10px;margin-top:6px;"><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">📦 检测到物品信息：</div><div style="font-size:13px;color:var(--text-secondary);line-height:1.8;"><div>名称：${escapeHtml(ic.name)}</div><div>价格：¥${escapeHtml(ic.price)}</div><div>数量：${escapeHtml(ic.quantity)}</div><div>分类：${escapeHtml(ic.category)}</div></div><button style="margin-top:8px;padding:6px 12px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;" onclick="addItemFromCard(${cardJson})">一键添加</button></div>${msg.content ? msg.content.replace(/\n/g, '<br>') : ''}</div></div>`;
+                }
+                const imgs = (msg.images || []).map(src =>
+                    `<img src="${escapeHtml(src)}" alt="附件图片">`).join('');
+                return `<div class="chat-msg ${msg.role}"><div class="chat-avatar">${msg.role === 'bot' ? '🐻' : '🍯'}</div><div class="chat-bubble">${msg.content ? msg.content.replace(/\n/g, '<br>') : ''}${imgs}</div></div>`;
+            }).join('');
+            container.scrollTop = container.scrollHeight;
+            renderChatQuickbar();
+        }
+
+        function clearChat() {
+            chatHistory = [];
+            renderChatMessages();
+            showToast('聊天记录已清空');
+        }
+
+        function openApiSettings() {
+            const html = `
+            <div class="modal-overlay active" id="apiModal" style="z-index:600;">
+              <div class="modal-content" style="position:relative;width:85%;">
+                <button class="modal-close" onclick="document.getElementById('apiModal').remove()">✕</button>
+                <h3>🔑 API 设置</h3>
+                <div style="font-size:12px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">DeepSeek 密钥: 访问 platform.deepseek.com → API Keys → 创建<br>GPT-4o 密钥: 访问 platform.openai.com → API Keys → 创建<br>密钥以 sk- 开头，请妥善保管</div>
+                <div class="form-group"><label>API Base URL</label><input type="text" id="apiBaseInput" value="${escapeHtml(state.apiBase)}" placeholder="https://api.deepseek.com/v1"></div>
+                <div class="form-group"><label>API Key</label><input type="password" id="apiKeyInput" value="${escapeHtml(state.apiKey)}" placeholder="sk-xxxxxxxx"></div>
+                <div style="font-size:11px;color:var(--primary-dark);margin-bottom:10px;">💡 注意：若要支持图片识别，请选择 GPT-4o 模型并将 Base URL 设置为 https://api.openai.com/v1</div>
+                <button class="btn-save" style="width:100%;margin-top:8px;" onclick="saveApiSettings()">保存</button>
+              </div>
+            </div>`;
+            getEl().insertAdjacentHTML('beforeend', html);
+        }
+
+        function saveApiSettings() {
+            const keyInput = document.getElementById('apiKeyInput');
+            const baseInput = document.getElementById('apiBaseInput');
+            const key = keyInput ? keyInput.value.trim() : '';
+            const base = baseInput ? baseInput.value.trim() : '';
+            state.apiKey = key;
+            state.apiBase = base || 'https://api.deepseek.com/v1';
+            localStorage.setItem('deepseek_api_key', key);
+            localStorage.setItem('deepseek_api_base', state.apiBase);
+            const modal = document.getElementById('apiModal');
+            if (modal) modal.remove();
+            renderAI();
+            showToast('API设置已保存');
+            saveState();
+        }
+
+        async function sendChat() {
+            const input = document.getElementById('chatInput');
+            const text = (input && input.value || '').trim();
+            if (!text && pendingImages.length === 0) return;
+            if (input) input.value = '';
+            autoResizeChatInput();
+            updateChatSendBtn();
+            const userImages = pendingImages.slice();
+            pendingImages = [];
+            renderAttachPreview();
+            chatHistory.push({
+                role: 'user',
+                content: text || (userImages.length ? '📷 这是拍的照片/相册选的图，帮我识别并记录～' : ''),
+                images: userImages
+            });
+            renderChatMessages();
+            const loadingIdx = chatHistory.length;
+            chatHistory.push({ role: 'bot', content: '🐻 正在思考...' });
+            renderChatMessages();
+
+            if (!state.apiKey) {
+                setTimeout(() => {
+                    chatHistory[loadingIdx] = { role: 'bot', content: buildLocalReply(text, userImages) };
+                    renderChatMessages();
+                }, 500);
+                return;
+            }
+
+            const supportsVision = state.aiModel.includes('gpt-4o') || state.aiModel.includes('vision') || state
+                .aiModel.includes('vl') || state.aiModel.includes('ocr') || state.aiModel.includes('glm') || state
+                .aiModel.includes('qwen') || state.aiModel.includes('doubao');
+            let imagesToSend = userImages;
+            if (!supportsVision && userImages.length > 0) {
+                imagesToSend = [];
+                chatHistory.push({
+                    role: 'bot',
+                    content: '🐻 当前模型不支持直接识别图片。\n\n💡 建议：在设置中切换为 "GPT-4o" 等支持多模态的模型，并配置对应的 API Key。\n\n或者，你可以先用文字描述一下图片里的物品，我来帮你生成记录~'
+                });
+                renderChatMessages();
+                return;
+            }
+
+            const totalQty = state.items.reduce((s, i) => s + i.quantity, 0);
+            const totalAsset = state.items.reduce((s, i) => s + i.price * i.quantity, 0);
+            const expiring = state.reminders.filter(r => r.status !== 'expired').map(r =>
+                `${r.name}(${r.days}天)`).join('、') || '无';
+            const idleItems = state.items.filter(i => i.status && i.status.includes('闲置')).slice(0, 8).map(i => i
+                .name).join('、') || '无';
+            const systemPrompt = `你是"暖居收纳"APP的AI助手"小兜"，一只可爱的小熊。你的任务是：
+        1. 分析用户的物品收纳数据，给出实用、可执行的收纳建议
+        2. 用户发送的图片可能是物品/商品/收纳场景，请识别并帮助记录或分析
+        3. 闲聊陪伴、鼓励用户保持整洁
+
+        当前用户数据概览：
+        - 物品总数：${totalQty}
+        - 资产总值：¥${Number(totalAsset).toLocaleString()}
+        - 空间：${state.rooms.map(r=>r.name).join('、')}
+        - 分类：${state.categories.join('、')}
+        - 即将过期：${expiring}
+        - 闲置物品：${idleItems}
+
+        当用户发送图片时，请仔细识别图片中的物品，并按照以下JSON格式回复（不要包含额外解释，直接输出JSON）：
+        {"name":"物品名称","price":数值,"quantity":数值,"category":"分类（从给定分类中选择）"}
+        如果无法识别，请回复"抱歉，我没能识别出物品信息，请提供更多细节"。
+
+        请用中文回复，语气亲切可爱，适当使用emoji。`;
+            const recent = chatHistory.slice(-12);
+            const messages = [{ role: 'system', content: systemPrompt }];
+            for (const m of recent) {
+                if (m.content === '🐻 正在思考...') continue;
+                if (m.role === 'user') {
+                    const parts = [];
+                    if (m.content) parts.push({ type: 'text', text: m.content });
+                    (m.images || []).forEach(src => parts.push({ type: 'image_url', image_url: { url: src } }));
+                    messages.push({
+                        role: 'user',
+                        content: parts.length === 1 && parts[0].type === 'text' ? parts[0].text : parts
+                    });
+                } else {
+                    messages.push({ role: 'assistant', content: m.content });
+                }
+            }
+            try {
+                const response = await fetch(`${state.apiBase}/chat/completions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.apiKey}` },
+                    body: JSON.stringify({ model: state.aiModel, messages, stream: false })
+                });
+                if (!response.ok) throw new Error('API请求失败 ' + response.status);
+                const data = await response.json();
+                const reply = (data.choices && data.choices[0] && data.choices[0].message.content) ||
+                    '（没有得到回复内容）';
+                const parsed = parseItemFromAI(reply);
+                if (parsed) chatHistory[loadingIdx] = { role: 'bot', content: reply, itemCard: parsed };
+                else chatHistory[loadingIdx] = { role: 'bot', content: reply };
+            } catch (err) {
+                console.error(err);
+                chatHistory[loadingIdx] = {
+                    role: 'bot',
+                    content: buildLocalReply(text, userImages) +
+                        '\n\n⚠️ 刚才有道联网请求出错，已切换为本地分析。'
+                };
+            }
+            renderChatMessages();
+        }
+
+        function parseItemFromAI(text) {
+            const match = text.match(/\{[\s\S]*\}/);
+            if (match) {
+                try {
+                    const json = JSON.parse(match[0]);
+                    if (json.name && json.price) {
+                        return {
+                            name: json.name,
+                            price: parseFloat(json.price) || 0,
+                            quantity: parseInt(json.quantity) || 1,
+                            category: json.category || '📦 其他'
+                        };
+                    }
+                } catch (e) {}
+            }
+            return null;
+        }
+
+        function addItemFromCard(card) {
+            if (!card || !card.name) return;
+            const newItem = {
+                id: Date.now(),
+                name: card.name,
+                price: card.price || 0,
+                quantity: card.quantity || 1,
+                purchaseDate: '',
+                expireDate: '',
+                openDate: '',
+                openUseDays: '',
+                room: (state.rooms[0]?.name || ''),
+                furniture: '',
+                category: card.category || '📦 其他',
+                status: '✅ 在用',
+                tags: [],
+                notes: '',
+                photos: [],
+                dailyPrice: 0,
+            };
+            newItem.dailyPrice = calcDailyPrice(newItem);
+            state.items.push(newItem);
+            generateReminders();
+            showToast('已添加物品：' + card.name);
+            renderChatMessages();
+            saveState();
+        }
+
+        function buildLocalReply(text, images) {
+            const hasImg = images && images.length > 0;
+            const lower = (text || '').toLowerCase();
+            let reply = '';
+            if (hasImg) reply +=
+                '📷 收到你发来的图片啦！当前模型不支持识图，配置支持多模态的API（如GPT-4o）后，我可以精准识别图中物品并帮你一键添加记录。\n\n';
+            if (lower.includes('资产') || lower.includes('统计') || lower.includes('概况')) {
+                const total = state.items.reduce((s, i) => s + i.price * i.quantity, 0);
+                const totalQty = state.items.reduce((s, i) => s + i.quantity, 0);
+                const daily = state.items.reduce((s, i) => s + parseFloat(i.dailyPrice || 0), 0);
+                reply +=
+                    `📊 资产概况：\n• 总资产：¥${Number(total).toLocaleString()}\n• 物品总数：${totalQty}\n• 日均成本：¥${daily.toFixed(2)}\n\n💡 建议：把资产按空间/分类查看，更容易发现重复消费。`;
+            } else if (lower.includes('过期') || lower.includes('提醒') || lower.includes('食品')) {
+                const expiring = state.reminders.filter(r => r.status !== 'expired');
+                reply += expiring.length ?
+                    `⏰ 即将过期（${expiring.length}件）：\n${expiring.slice(0,8).map(r=>`• ${r.name}（${r.days}天后，${r.room}·${r.furniture}）`).join('\n')}\n\n💡 建议：临期食品优先消耗，建立"先进先出"取用顺序。` :
+                    '✅ 目前没有即将过期的物品，做得很好！';
+            } else if (lower.includes('闲置') || lower.includes('减少') || lower.includes('断舍离')) {
+                const idle = state.items.filter(i => i.status && i.status.includes('闲置'));
+                reply += idle.length ?
+                    `📦 闲置物品（${idle.length}件）：\n${idle.slice(0,6).map(i=>`• ${i.name}`).join('\n')}\n\n💡 建议：超过3个月不用的物品可考虑"送人/卖出"，回笼空间与资金。` :
+                    '🎉 暂未标记闲置物品，可以给不常用的物品打上"闲置"状态便于梳理。';
+            } else if (lower.includes('冰箱') || lower.includes('厨房') || lower.includes('食物')) {
+                reply +=
+                    '🧊 冰箱收纳建议：\n1. 分区：上层熟食、下层生食，门架放调料\n2. 标签：启封后标注启用日期\n3. 先进先出：新买的后放，旧的靠前\n4. 每周清点一次临期食材';
+            } else if (lower.includes('化妆') || lower.includes('护肤') || lower.includes('保质期')) {
+                reply +=
+                    '💄 化妆品保质期管理：\n1. 启用效期：一般6-12个月\n2. 录入时填写"启封日期"+"启封效期"\n3. 临期前15/7天我会提醒你\n4. 眼妆、防晒优先消耗';
+            } else if (lower.includes('收纳') || lower.includes('整理') || lower.includes('建议') || lower.includes(
+                    '整洁')) {
+                reply +=
+                    '🗂️ 通用收纳建议：\n1. 按使用频率分层：常用→顺手位置，少用→高处/深处\n2. 同类集中：同分类物品放同一位置\n3. 透明收纳盒+标签，一眼可见\n4. 定期（每月）盘点，处理过期/闲置\n5. 一进一出原则，避免无限制囤积';
+            } else if (lower.includes('分析') || lower.includes('数据')) {
+                const total = state.items.reduce((s, i) => s + i.price * i.quantity, 0);
+                const totalQty = state.items.reduce((s, i) => s + i.quantity, 0);
+                const daily = state.items.reduce((s, i) => s + parseFloat(i.dailyPrice || 0), 0);
+                const byRoom = {};
+                state.items.forEach(i => { byRoom[i.room] = (byRoom[i.room] || 0) + i.price * i.quantity; });
+                const topRoom = Object.entries(byRoom).sort((a, b) => b[1] - a[1])[0];
+                reply +=
+                    `📊 你的收纳数据诊断：\n• 总资产：¥${Number(total).toLocaleString()}\n• 物品总数：${totalQty}\n• 日均成本：¥${daily.toFixed(2)}\n\n`;
+                if (topRoom) reply +=
+                    `🏠 资产最集中的空间：${topRoom[0]}（¥${Number(topRoom[1]).toLocaleString()}）\n\n`;
+                reply +=
+                    '💡 建议：\n1. 对高价值空间做一次"是否常用"复盘\n2. 闲置率高的分类优先断舍离\n3. 食品/护肤品关注临期提醒，避免浪费';
+            } else if (lower.includes('处理') || lower.includes('找出')) {
+                const idle = state.items.filter(i => i.status && (i.status.includes('闲置') || i.status.includes(
+                    '破损')));
+                reply += idle.length ?
+                    `♻️ 为你找出可处理物品（${idle.length}件）：\n${idle.slice(0,6).map(i=>`• ${i.name}（${i.room||''}·${i.furniture||''}）`).join('\n')}\n\n💡 建议：闲置可"卖出/送人"回笼空间；破损建议直接丢弃。` :
+                    '🎉 暂未标记闲置/破损物品，可以定期梳理并打上状态标签。';
+            } else {
+                reply += '🐻 我可以先给你一些基础建议～\n\n';
+                reply +=
+                    '💡 试试点下方快捷语或问我：\n• "分析我的收纳数据并给出建议"\n• "我的家怎么收纳更整洁"\n• "帮我找出闲置物品并给处理建议"\n\n配置 API Key 后我能结合你的真实数据给出更精准的分析哦！';
+            }
+            return reply;
+        }
+
+        // ========== 存放位置物品列表 ==========
+        function openFurniture(roomName, furnitureName) {
+            state.selectedFurniture = { room: roomName, furniture: furnitureName };
+            const page = $('#page-furniture');
+            page.classList.add('active');
+            $$('.page').forEach(p => { if (p.id !== 'page-furniture') p.classList.remove('active'); });
+            state.currentPage = 'furniture';
+            renderFurniturePage();
+        }
+
+        function renderFurniturePage() {
+            const page = $('#page-furniture');
+            if (!state.selectedFurniture) return;
+            const { room, furniture } = state.selectedFurniture;
+            const items = state.items.filter(i => i.room === room && i.furniture === furniture);
+            const s = state.settings.cardFields;
+            page.innerHTML = `
+            <div class="sub-page-header" style="position:sticky;top:0;z-index:10;">
+              <div class="back-btn" onclick="showPage('home')">‹</div>
+              <h2>${escapeHtml(furniture)}</h2>
+              <span style="font-size:12px;color:var(--text-secondary);margin-left:auto;padding-right:16px;">${items.length} 件</span>
+            </div>
+            <div class="item-grid" style="padding:14px 16px 30px;">
+              ${items.length === 0 ? '<div class="empty-state" style="grid-column:1/-1"><div class="emoji">📭</div><div class="text">该位置暂无物品</div></div>' : ''}
+              ${items.map(item => {
+                const days = daysUntil(item.expireDate);
+                let badge = '';
+                if (days !== null && days <= 30) { const cls = days < 0 ? 'urgent' : days <= 7 ? 'urgent' : 'soon'; badge = `<div class="expire-badge ${cls}">${days < 0 ? '已过期' : days + '天后到期'}</div>`; }
+                let photoHTML = '';
+                if (s.photo) {
+                  let coverContent = '';
+                  if (item.photos && item.photos[0]) {
+                    coverContent = `<img src="${escapeHtml(item.photos[0])}" style="width:100%;height:100%;object-fit:cover;" alt="">`;
+                  } else {
+                    coverContent = escapeHtml(item.category ? item.category.split(' ')[0] : '📦');
+                  }
+                  photoHTML = `<div class="photo">${coverContent}</div>`;
+                }
+                return `<div class="item-card" onclick="openItemDetail(${item.id})" oncontextmenu="editItem(${item.id});return false;">${badge}${photoHTML}<div class="info"><div class="name">${escapeHtml(getDisplayName(item.name))}</div><div class="meta"><span>💰 ¥${escapeHtml(item.dailyPrice)}/天</span><span>📦 ×${escapeHtml(item.quantity)}</span></div></div></div>`;
+              }).join('')}
+            </div>
+          `;
+        }
+
+        // ========== 物品详情 ==========
+        function openItemDetail(id) {
+            const item = state.items.find(i => i.id === id);
+            if (!item) return;
+            const page = $('#page-item-detail');
+            page.classList.add('active');
+            $$('.page').forEach(p => { if (p.id !== 'page-item-detail') p.classList.remove('active'); });
+            state.currentPage = 'item-detail';
+            const cover = item.photos && item.photos[0] ?
+                `<img src="${escapeHtml(item.photos[0])}" style="width:100%;height:100%;object-fit:cover;" alt="">` :
+                escapeHtml(item.category ? item.category.split(' ')[0] : '📦');
+            const tagHtml = (item.tags || []).map(t =>
+                `<span style="display:inline-block;padding:2px 8px;background:var(--primary-light);border-radius:10px;font-size:12px;margin:2px 4px 0 0;color:var(--primary-dark);">${escapeHtml(t)}</span>`
+                ).join('') || '-';
+            const expireDisplay = item.expireDate ? item.expireDate + (daysUntil(item.expireDate) !== null ? ` (${daysUntil(item.expireDate) < 0 ? '已过期' : daysUntil(item.expireDate) + '天后过期'})` : '') :
+                '-';
+            page.innerHTML = `
+            <div class="sub-page-header" style="position:sticky;top:0;z-index:10;">
+              <div class="back-btn" onclick="backFromDetail()">‹</div>
+              <h2>物品详情</h2>
+              <div style="margin-left:auto;display:flex;gap:8px;padding-right:12px;">
+                <button onclick="editItem(${item.id})" style="padding:4px 10px;border-radius:8px;background:var(--primary-light);border:none;color:var(--primary-dark);font-size:12px;cursor:pointer;">编辑</button>
+                <button onclick="deleteItem(${item.id})" style="padding:4px 10px;border-radius:8px;background:#FFE0E3;border:none;color:#FF4757;font-size:12px;cursor:pointer;">删除</button>
+              </div>
+            </div>
+            <div style="padding:16px;">
+              <div class="item-detail-photo">${cover}</div>
+              <div style="background:var(--card-bg);border-radius:14px;padding:16px;border:1px solid var(--border);">
+                <h3 style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:12px;">${escapeHtml(getDisplayName(item.name))}</h3>
+                ${item.photos && item.photos.length > 1 ? `<div style="display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;">${item.photos.map(p=>`<img src="${escapeHtml(p)}" style="width:50px;height:50px;border-radius:8px;object-fit:cover;flex-shrink:0;" alt="">`).join('')}</div>` : ''}
+                <div class="detail-row"><div class="dl">单价</div><div class="dv">¥${escapeHtml(item.price)}</div></div>
+                <div class="detail-row"><div class="dl">数量</div><div class="dv">×${escapeHtml(item.quantity)}</div></div>
+                <div class="detail-row"><div class="dl">总价</div><div class="dv">¥${escapeHtml(item.price * item.quantity)}</div></div>
+                <div class="detail-row"><div class="dl">日均价</div><div class="dv">¥${escapeHtml(item.dailyPrice)}</div></div>
+                <div class="detail-row"><div class="dl">购买日期</div><div class="dv">${escapeHtml(item.purchaseDate || '-')}</div></div>
+                <div class="detail-row"><div class="dl">过期日期</div><div class="dv">${escapeHtml(expireDisplay)}</div></div>
+                <div class="detail-row"><div class="dl">启封日期</div><div class="dv">${escapeHtml(item.openDate || '-')}</div></div>
+                <div class="detail-row"><div class="dl">启用效期</div><div class="dv">${item.openUseDays ? escapeHtml(item.openUseDays) + '天' : '-'}</div></div>
+                <div class="detail-row"><div class="dl">空间</div><div class="dv">${escapeHtml(item.room || '-')}</div></div>
+                <div class="detail-row"><div class="dl">位置</div><div class="dv">${escapeHtml(item.furniture || '-')}</div></div>
+                <div class="detail-row"><div class="dl">分类</div><div class="dv">${escapeHtml(item.category || '-')}</div></div>
+                <div class="detail-row"><div class="dl">状态</div><div class="dv">${escapeHtml(item.status || '-')}</div></div>
+                <div class="detail-row"><div class="dl">标签</div><div class="dv">${tagHtml}</div></div>
+                <div class="detail-row"><div class="dl">备注</div><div class="dv">${escapeHtml(item.notes || '-')}</div></div>
+              </div>
+            </div>
+          `;
+        }
+
+        function backFromDetail() {
+            if (state.selectedFurniture) {
+                const { room, furniture } = state.selectedFurniture;
+                openFurniture(room, furniture);
+            } else {
+                showPage('items');
+            }
+        }
+
+        function deleteItem(id) {
+            if (confirm('确定删除该物品？')) {
+                state.items = state.items.filter(i => i.id !== id);
+                generateReminders();
+                renderItems();
+                showPage('items');
+                showToast('物品已删除');
+                saveState();
+            }
+        }
+
+        // ========== 录入页面 ==========
+        function openEntry(itemId) {
+            state.editingItem = itemId ? state.items.find(i => i.id === itemId) : null;
+            state.selectedTags = state.editingItem ? [...(state.editingItem.tags || [])] : [];
+            state._currentPhotos = state.editingItem ? [...(state.editingItem.photos || [])] : [];
+            const page = $('#page-entry');
+            page.classList.add('no-page-pad');
+            page.classList.add('active');
+            $$('.page').forEach(p => { if (p.id !== 'page-entry') p.classList.remove('active'); });
+            state.currentPage = 'entry';
+            renderEntryPage();
+        }
+
+        function renderEntryPage() {
+            const page = $('#page-entry');
+            page.classList.add('no-page-pad');
+            const editing = state.editingItem;
+            const f = state.settings.formFields;
+            const photos = state._currentPhotos || [];
+            page.innerHTML = `
+            <div class="entry-header" style="position:sticky;top:0;z-index:10;">
+              <div class="back-btn" onclick="showPage('items')">✕</div>
+              <h2>${editing ? '编辑物品' : '添加物品'}</h2>
+              <div style="width:36px;"></div>
+            </div>
+            <div style="padding:12px 0 0;">
+              ${f.photo ? `<div class="form-group"><label>📷 照片（最多3张，第一张为封面）</label><div class="photo-upload" id="photoUpload" style="margin-top:6px;"></div><div class="photo-hint">连续点击2次非首张照片可设为封面；拖拽可调整顺序；× 删除。相册支持一次选多张（最多3张）。</div></div>` : ''}
+              <div class="entry-tabs">
+                <div class="entry-tab" onclick="addPhoto('camera')"><div class="eicon">📸</div><div class="etext">拍照录入</div></div>
+                <div class="entry-tab" onclick="addPhoto('album')"><div class="eicon">🖼️</div><div class="etext">上传照片</div></div>
+              </div>
+              ${f.name ? `<div class="form-group"><label>物品名称 *</label><input type="text" id="f_name" value="${escapeHtml(editing?.name || '')}" placeholder="如：精华液"></div>` : ''}
+              <div class="form-row">
+                ${f.price ? `<div class="form-group"><label>单价 (¥)</label><input type="number" id="f_price" value="${editing?.price || ''}" placeholder="0"></div>` : ''}
+                ${f.quantity ? `<div class="form-group"><label>数量</label><input type="number" id="f_quantity" value="${editing?.quantity || 1}" placeholder="1"></div>` : ''}
+              </div>
+              ${f.purchaseDate ? `<div class="form-group"><label>📅 购买日期</label><input type="date" id="f_purchaseDate" value="${editing?.purchaseDate || ''}"></div>` : ''}
+              ${f.expireDate ? `<div class="form-group"><label>⏰ 过期日期</label><input type="date" id="f_expireDate" value="${editing?.expireDate || ''}"></div>` : ''}
+              ${f.openDate ? `<div class="form-group"><label>📅 启封日期</label><input type="date" id="f_openDate" value="${editing?.openDate || ''}"></div>` : ''}
+              ${f.openUseDays ? `<div class="form-group"><label>📝 启用效期(天)</label><input type="number" id="f_openUseDays" value="${editing?.openUseDays || ''}" placeholder="如：365"></div>` : ''}
+              <div class="form-row">
+                ${f.room ? `<div class="form-group"><label>🏠 所在空间</label><select id="f_room" onchange="updateFurnitureOptions()">${state.rooms.map(r => `<option value="${escapeHtml(r.name)}" ${editing?.room === r.name ? 'selected' : ''}>${escapeHtml(r.name)}</option>`).join('')}</select></div>` : ''}
+                ${f.furniture ? `<div class="form-group"><label>🪑 存放位置</label><select id="f_furniture"></select></div>` : ''}
+              </div>
+              ${f.category ? `<div class="form-group"><label>📂 分类</label><select id="f_category">${state.categories.map(c => `<option value="${escapeHtml(c)}" ${editing?.category === c ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('')}</select></div>` : ''}
+              ${f.status ? `<div class="form-group"><label>📌 状态</label><select id="f_status">${state.statuses.map(s => `<option value="${escapeHtml(s)}" ${editing?.status === s ? 'selected' : ''}>${escapeHtml(s)}</option>`).join('')}</select></div>` : ''}
+              ${f.tags ? `<div class="form-group"><label>🏷️ 标签（可多选）</label><div class="chip-group" id="tagChips" style="margin-top:6px;">${state.tags.map(t => `<span class="chip ${state.selectedTags.includes(t) ? 'selected' : ''}" onclick="toggleTagChip(this,'${escapeHtml(t)}')">${escapeHtml(t)}</span>`).join('')}</div></div>` : ''}
+              ${f.notes ? `<div class="form-group"><label>📝 备注</label><input type="text" id="f_notes" value="${escapeHtml(editing?.notes || '')}" placeholder="补充说明..."></div>` : ''}
+              <div class="entry-form-actions">
+                <button class="btn-cancel" onclick="showPage('items')">取消</button>
+                <button class="btn-save" onclick="saveItem(false)">保存</button>
+                <button class="btn-save" onclick="saveItem(true)">保存+继续</button>
+              </div>
+            </div>
+          `;
+            updateFurnitureOptions();
+            renderPhotoUpload();
+        }
+
+        function updateFurnitureOptions() {
+            const roomSel = document.getElementById('f_room');
+            const furnSel = document.getElementById('f_furniture');
+            if (!roomSel || !furnSel) return;
+            const room = state.rooms.find(r => r.name === roomSel.value);
+            if (!room) {
+                furnSel.innerHTML = '';
+                return;
+            }
+            const editing = state.editingItem;
+            furnSel.innerHTML = room.furniture.map(f =>
+                `<option value="${escapeHtml(f.name)}" ${editing?.furniture === f.name ? 'selected' : ''}>${escapeHtml(f.name)}</option>`
+                ).join('');
+        }
+
+        function toggleTagChip(el, tag) {
+            el.classList.toggle('selected');
+            if (!state.selectedTags.includes(tag)) state.selectedTags.push(tag);
+            else state.selectedTags = state.selectedTags.filter(t => t !== tag);
+        }
+
+        function renderPhotoUpload() {
+            const wrap = document.getElementById('photoUpload');
+            if (!wrap) return;
+            const photos = state._currentPhotos || [];
+            const f = state.settings.formFields;
+            if (!f.photo) {
+                wrap.innerHTML = '';
+                return;
+            }
+            wrap.innerHTML = `
+            ${photos.map((p, i) => `<div class="photo-thumb draggable ${i === 0 ? 'is-cover' : ''}" draggable="true" ondragstart="photoDragStart(${i},event)" ondragover="photoDragOver(event)" ondrop="photoDrop(event,${i})" ontouchstart="photoDragStart(${i},event)" onclick="onPhotoClick(${i})"><img src="${escapeHtml(p)}" style="width:100%;height:100%;object-fit:cover;" alt="">${i === 0 ? '<div class="cover-badge">封面</div>' : '<div class="cover-set">双击设为封面</div>'}<div class="remove" onclick="removePhoto(${i});event.stopPropagation()">✕</div></div>`).join('')}
+            ${photos.length < 3 ? `<div class="photo-thumb add" onclick="addPhoto('album')" title="添加照片">＋</div>` : ''}
+          `;
+        }
+
+        function addPhoto(mode) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            if (mode === 'album') input.multiple = true;
+            if (mode === 'camera') input.capture = 'environment';
+            input.onchange = (e) => {
+                const files = e.target.files;
+                if (!files || !files.length) return;
+                if (!state._currentPhotos) state._currentPhotos = [];
+                const remain = 3 - state._currentPhotos.length;
+                if (remain <= 0) {
+                    showToast('最多只能添加3张照片');
+                    return;
+                }
+                let pending = 0,
+                    skipped = 0;
+                const list = Array.from(files).slice(0, remain);
+                list.forEach(file => {
+                    if (!file.type.startsWith('image/')) {
+                        skipped++;
+                        return;
+                    }
+                    pending++;
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        const img = new Image();
+                        img.onload = function() {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width,
+                                height = img.height;
+                            if (width > 800) {
+                                height = Math.round(height * 800 / width);
+                                width = 800;
+                            }
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.fillStyle = '#fff';
+                            ctx.fillRect(0, 0, width, height);
+                            ctx.drawImage(img, 0, 0, width, height);
+                            const compressed = canvas.toDataURL('image/jpeg', 0.7);
+                            state._currentPhotos.push(compressed);
+                            renderPhotoUpload();
+                            pending--;
+                            if (pending === 0) {
+                                showToast(mode === 'camera' ? '照片已拍摄（已压缩）' : (list.length -
+                                    skipped > 1 ? `已添加 ${list.length - skipped} 张照片（已压缩）` :
+                                    '照片已上传（已压缩）'));
+                                if (skipped > 0) showToast(`跳过 ${skipped} 个非图片文件`);
+                            }
+                        };
+                        img.onerror = function() { pending--; };
+                        img.src = ev.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            };
+            input.click();
+        }
+
+        let lastClickTime = 0,
+            lastClickedIndex = -1;
+
+        function onPhotoClick(index) {
+            const now = Date.now();
+            if (index === lastClickedIndex && (now - lastClickTime) < 300) {
+                if (index !== 0) setCover(index);
+                lastClickTime = 0;
+                lastClickedIndex = -1;
+            } else {
+                lastClickTime = now;
+                lastClickedIndex = index;
+            }
+        }
+
+        function removePhoto(index) {
+            if (!state._currentPhotos) return;
+            state._currentPhotos.splice(index, 1);
+            renderPhotoUpload();
+        }
+
+        function setCover(index) {
+            if (!state._currentPhotos || index < 0 || index >= state._currentPhotos.length) return;
+            const [item] = state._currentPhotos.splice(index, 1);
+            state._currentPhotos.unshift(item);
+            renderPhotoUpload();
+            showToast('已设为封面');
+        }
+
+        let dragIdx = -1,
+            dragStartX = 0,
+            dragStartY = 0,
+            dragEl = null,
+            dragList = [],
+            dragMoved = false;
+
+        function photoDragStart(i, ev) {
+            if (ev.type === 'pointerdown' && ev.button !== 0) return;
+            dragIdx = i;
+            dragMoved = false;
+            dragList = Array.from(document.querySelectorAll('.photo-thumb.draggable'));
+            dragEl = dragList[i];
+            if (!dragEl) return;
+            const t = ev.type === 'touchstart' ? ev.touches[0] : ev;
+            dragStartX = t.clientX;
+            dragStartY = t.clientY;
+            dragEl.classList.add('dragging');
+            if (ev.type === 'touchstart') {
+                document.addEventListener('touchmove', photoDragMove, { passive: false });
+                document.addEventListener('touchend', photoDragEnd);
+            } else {
+                document.addEventListener('pointermove', photoDragMove);
+                document.addEventListener('pointerup', photoDragEnd);
+            }
+        }
+
+        function photoDragMove(ev) {
+            if (dragIdx < 0 || !dragEl) return;
+            const t = ev.touches ? ev.touches[0] : ev;
+            const dx = t.clientX - dragStartX,
+                dy = t.clientY - dragStartY;
+            if (!dragMoved && Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
+            dragMoved = true;
+            if (ev.cancelable) ev.preventDefault();
+            dragEl.style.transform = `translate(${dx}px, ${dy}px)`;
+            dragEl.style.zIndex = '100';
+            let overIdx = dragIdx;
+            dragList.forEach((el, idx) => {
+                if (el === dragEl) return;
+                const r = el.getBoundingClientRect();
+                if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r
+                    .bottom) overIdx = idx;
+            });
+            if (overIdx !== dragIdx) {
+                const cur = state._currentPhotos.splice(dragIdx, 1)[0];
+                state._currentPhotos.splice(overIdx, 0, cur);
+                dragIdx = overIdx;
+                renderPhotoUpload();
+                dragList = Array.from(document.querySelectorAll('.photo-thumb.draggable'));
+                dragEl = dragList[dragIdx];
+                if (dragEl) {
+                    const r = dragEl.getBoundingClientRect();
+                    dragStartX = t.clientX - r.left;
+                    dragStartY = t.clientY - r.top;
+                    dragEl.classList.add('dragging');
+                }
+            }
+        }
+
+        function photoDragEnd() {
+            document.removeEventListener('touchmove', photoDragMove);
+            document.removeEventListener('touchend', photoDragEnd);
+            document.removeEventListener('pointermove', photoDragMove);
+            document.removeEventListener('pointerup', photoDragEnd);
+            if (dragEl) dragEl.classList.remove('dragging');
+            dragEl = null;
+            dragIdx = -1;
+            dragList = [];
+            if (dragMoved) renderPhotoUpload();
+        }
+
+        function photoDragOver(ev) {
+            ev.preventDefault();
+        }
+
+        function photoDrop(ev, i) {
+            ev.preventDefault();
+            const from = parseInt(ev.dataTransfer.getData('text/plain'), 10);
+            if (isNaN(from) || from === i) return;
+            const cur = state._currentPhotos.splice(from, 1)[0];
+            state._currentPhotos.splice(i, 0, cur);
+            renderPhotoUpload();
+        }
+
+        function saveItem(continueAdding) {
+            try {
+                const getValue = (id) => {
+                    const el = document.getElementById(id);
+                    return el ? el.value : '';
+                };
+                const itemData = {
+                    name: getValue('f_name') || '未命名',
+                    price: parseFloat(getValue('f_price')) || 0,
+                    quantity: parseInt(getValue('f_quantity')) || 1,
+                    purchaseDate: getValue('f_purchaseDate'),
+                    expireDate: getValue('f_expireDate'),
+                    openDate: getValue('f_openDate'),
+                    openUseDays: getValue('f_openUseDays') || '',
+                    room: getValue('f_room'),
+                    furniture: getValue('f_furniture'),
+                    category: getValue('f_category') || state.categories[0],
+                    status: getValue('f_status') || '✅ 在用',
+                    tags: [...state.selectedTags],
+                    notes: getValue('f_notes'),
+                    photos: state._currentPhotos || [],
+                    dailyPrice: 0,
+                };
+                itemData.dailyPrice = calcDailyPrice(itemData);
+                if (state.editingItem) {
+                    Object.assign(state.editingItem, itemData);
+                    showToast('物品已更新');
+                } else {
+                    const newItem = { id: Date.now(), ...itemData };
+                    state.items.push(newItem);
+                    showToast('物品已添加');
+                }
+                state.selectedTags = [];
+                if (!continueAdding) {
+                    state._currentPhotos = [];
+                    showPage('items');
+                } else {
+                    state.editingItem = null;
+                    state._currentPhotos = [];
+                    state.selectedTags = [];
+                    renderEntryPage();
+                }
+                renderItems();
+                renderHome();
+                generateReminders();
+                saveState();
+            } catch (err) {
+                console.error(err);
+                showToast('保存失败：' + err.message);
+            }
+        }
+
+        function editItem(id) {
+            openEntry(id);
+        }
+
+        function openSettings() {
+            showPage('settings');
+        }
+
+        // ========== 安卓软键盘适配 ==========
+        function bindKeyboardAdjust() {
+            const phone = document.querySelector('.phone');
+            if (!phone || !window.visualViewport) return;
+            const vv = window.visualViewport;
+            const onResize = () => {
+                const chatPage = document.getElementById('page-ai');
+                if (!chatPage || !chatPage.classList.contains('active')) return;
+                const offset = window.innerHeight - vv.height - vv.offsetTop;
+                const bar = chatPage.querySelector('.chat-input-bar');
+                if (bar) bar.style.bottom = (offset > 0 ? offset : 0) + 'px';
+            };
+            vv.addEventListener('resize', onResize);
+            vv.addEventListener('scroll', onResize);
+        }
+
+        // ========== 初始化 ==========
+        function init() {
+            window.addEventListener('beforeunload', forceSave);
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'hidden') forceSave();
+            });
+            loadState();
+            renderApp();
+            generateReminders();
+            bindKeyboardAdjust();
+            setTimeout(() => {
+                showWelcome();
+            }, 500);
+        }
+
+        // 暴露全局函数
+        window.showPage = showPage;
+        window.navigateTo = navigateTo;
+        window.toggleMenu = toggleMenu;
+        window.closeMenu = closeMenu;
+        window.closeMenuAndGoHome = closeMenuAndGoHome;
+        window.openSettings = openSettings;
+        window.randomTheme = randomTheme;
+        window.switchRoom = switchRoom;
+        window.openFurniture = openFurniture;
+        window.openItemDetail = openItemDetail;
+        window.backFromDetail = backFromDetail;
+        window.deleteItem = deleteItem;
+        window.openEntry = openEntry;
+        window.editItem = editItem;
+        window.saveItem = saveItem;
+        window.addPhoto = addPhoto;
+        window.removePhoto = removePhoto;
+        window.renderPhotoUpload = renderPhotoUpload;
+        window.onPhotoClick = onPhotoClick;
+        window.setCover = setCover;
+        window.photoDragStart = photoDragStart;
+        window.photoDragOver = photoDragOver;
+        window.photoDrop = photoDrop;
+        window.toggleTagChip = toggleTagChip;
+        window.updateFurnitureOptions = updateFurnitureOptions;
+        window.setFilter = setFilter;
+        window.setSubFilter = setSubFilter;
+        window.filterItems = filterItems;
+        window.markReminderRead = markReminderRead;
+        window.deleteReminder = deleteReminder;
+        window.readAllReminders = readAllReminders;
+        window.deleteAllReminders = deleteAllReminders;
+        window.openReminders = openReminders;
+        window.addRoom = addRoom;
+        window.editRoom = editRoom;
+        window.deleteRoom = deleteRoom;
+        window.addFurniture = addFurniture;
+        window.deleteFurniture = deleteFurniture;
+        window.addCategory = addCategory;
+        window.deleteCategory = deleteCategory;
+        window.editCategory = editCategory;
+        window.addTag = addTag;
+        window.deleteTag = deleteTag;
+        window.addStatus = addStatus;
+        window.deleteStatus = deleteStatus;
+        window.selectTheme = selectTheme;
+        window.downloadTemplate = downloadTemplate;
+        window.saveFile = saveFile;
+        window.exportExcel = exportExcel;
+        window.importExcel = importExcel;
+        window.toggleSetting = toggleSetting;
+        window.toggleAllDisplayFields = toggleAllDisplayFields;
+        window.openApiSettings = openApiSettings;
+        window.saveApiSettings = saveApiSettings;
+        window.sendChat = sendChat;
+        window.useQuickPrompt = useQuickPrompt;
+        window.chatUploadImages = chatUploadImages;
+        window.chatTakePhoto = chatTakePhoto;
+        window.removePendingImage = removePendingImage;
+        window.focusSearch = focusSearch;
+        window.onHomeSearch = onHomeSearch;
+        window.doHomeSearch = doHomeSearch;
+        window.applyTheme = applyTheme;
+        window.clearChat = clearChat;
+        window.addItemFromCard = addItemFromCard;
+        window.changeAIModel = changeAIModel;
+        window.state = state;
+        window.bottomNavTo = bottomNavTo;
+        window.openChatImageSource = openChatImageSource;
+        window.hideChatSheet = hideChatSheet;
+        window.onChatFiles = onChatFiles;
+        window.autoResizeChatInput = autoResizeChatInput;
+        window.updateChatSendBtn = updateChatSendBtn;
+
+        // 启动
+        init();
+    </script>
+</body>
+</html>
